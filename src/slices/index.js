@@ -8,13 +8,15 @@ import LoginReducer from "./auth/login/reducer";
 import AccountReducer from "./auth/register/reducer";
 import ForgetPasswordReducer from "./auth/forgetpwd/reducer";
 import ProfileReducer from "./auth/profile/reducer";
+import OrganizationReducer from "./organization/reducer";
 
 const rootReducer = combineReducers({
-    Layout: LayoutReducer,
-    Login: LoginReducer,
-    Account: AccountReducer,
-    ForgetPassword: ForgetPasswordReducer,
-    Profile: ProfileReducer,
+  Layout: LayoutReducer,
+  Login: LoginReducer,
+  Account: AccountReducer,
+  ForgetPassword: ForgetPasswordReducer,
+  Profile: ProfileReducer,
+  Org: OrganizationReducer,
 });
 
 export default rootReducer;

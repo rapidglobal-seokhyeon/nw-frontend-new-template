@@ -6,6 +6,7 @@ export const POST_REGISTER = "/api/auth/register";
 
 // Organization
 export const GET_ORGANIZATION = "/api/v1/org";
+export const PATCH_ORG_ENABLED = "/api/v1/org";
 
 //PROFILE
 // export const POST_EDIT_JWT_PROFILE = "/post-jwt-profile";
