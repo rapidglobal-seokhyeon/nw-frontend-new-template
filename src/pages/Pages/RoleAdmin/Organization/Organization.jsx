@@ -6,19 +6,19 @@ import TableContainer from "../../../../Components/Common/TableContainer";
 import { Designation, Contact, Type, Status } from "./TableCols";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
-import { getOrganizationList } from "../../../../slices/thunks";
+// import { getOrganizationList } from "../../../../slices/thunks";
 
 const Organization = () => {
   const dispatch = useDispatch();
 
-  const selectOrgListData = createSelector((state) => state);
+  const selectOrgListData = createSelector(state => state);
 
   const appList = useSelector(selectOrgListData);
 
   console.log(appList);
 
   useEffect(() => {
-    dispatch(getOrganizationList());
+    // dispatch(getOrganizationList());
     console.log(appList);
   }, [dispatch]);
 
@@ -26,7 +26,7 @@ const Organization = () => {
     () => [
       {
         Header: "Application ID",
-        Cell: (appList) => (
+        Cell: appList => (
           <>
             <NavLink to="#" className="fw-semibold link-primary">
               {appList.row.original.aapid}
@@ -36,12 +36,10 @@ const Organization = () => {
       },
       {
         Header: "COMPANY NAME",
-        Cell: (appList) => (
+        Cell: appList => (
           <>
             <div className="d-flex align-items-center">
-              <div className="flex-grow-1 ms-2 ">
-                {appList.row.original.company[0]}
-              </div>
+              <div className="flex-grow-1 ms-2 ">{appList.row.original.company[0]}</div>
             </div>
           </>
         ),
@@ -50,16 +48,15 @@ const Organization = () => {
         Header: "Designation",
         accessor: "designation",
         filterable: true,
-        Cell: (cellProps) => {
+        Cell: cellProps => {
           return <Designation {...cellProps} />;
         },
       },
       {
         Header: "Apply Date",
-        Cell: (appList) => (
+        Cell: appList => (
           <>
-            {appList.row.original.date}{" "}
-            {/* <small className="text-muted">{appList.row.original.time}</small> */}
+            {appList.row.original.date} {/* <small className="text-muted">{appList.row.original.time}</small> */}
             <div>{appList.row.original.time}</div>
           </>
         ),
@@ -68,7 +65,7 @@ const Organization = () => {
         Header: "Order Value",
         accessor: "orderValue",
         filterable: true,
-        Cell: (cellProps) => {
+        Cell: cellProps => {
           return <Contact {...cellProps} />;
           // return <div>{cellProps}</div>;
         },
@@ -77,7 +74,7 @@ const Organization = () => {
         Header: "Type",
         accessor: "type",
         filterable: true,
-        Cell: (cellProps) => {
+        Cell: cellProps => {
           return <Type {...cellProps} />;
           // return <div>{cellProps}</div>;
         },
@@ -86,13 +83,13 @@ const Organization = () => {
         Header: "Status",
         accessor: "status",
         filterable: true,
-        Cell: (cellProps) => {
+        Cell: cellProps => {
           return <Status {...cellProps} />;
           // return <div>{cellProps}</div>;
         },
       },
     ],
-    []
+    [],
   );
   return (
     <React.Fragment>

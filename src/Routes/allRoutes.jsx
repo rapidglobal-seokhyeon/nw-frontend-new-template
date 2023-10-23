@@ -6,7 +6,7 @@ import DashboardEcommerce from "../pages/DashboardEcommerce";
 
 //login
 import Login from "../pages/Authentication/Login";
-import ForgetPasswordPage from "../pages/Authentication/ForgetPassword";
+// import ForgetPasswordPage from "../pages/Authentication/ForgetPassword";
 import Logout from "../pages/Authentication/Logout";
 import Register from "../pages/Authentication/Register";
 
@@ -16,7 +16,7 @@ import Maintenance from "../pages/Pages/Maintenance/Maintenance";
 import ComingSoon from "../pages/Pages/ComingSoon/ComingSoon";
 
 // User Profile
-import UserProfile from "../pages/Authentication/user-profile";
+// import UserProfile from "../pages/Authentication/user-profile";
 
 import Organization from "../pages/Pages/RoleAdmin/Organization/Organization";
 import Dashboard from "../pages/Pages/OrgAdmin/Dashboard/Dashboard";
@@ -53,7 +53,7 @@ const authProtectedRoutes = [
   { path: "/index", component: <DashboardEcommerce /> },
 
   //User Profile
-  { path: "/profile", component: <UserProfile /> },
+  // { path: "/profile", component: <UserProfile /> },
 
   //Pages
   { path: "/pages-starter", component: <Starter /> },
@@ -97,7 +97,7 @@ const publicRoutes = [
   // Authentication Page
   { path: "/logout", component: <Logout /> },
   { path: "/login", component: <Login /> },
-  { path: "/forgot-password", component: <ForgetPasswordPage /> },
+  // { path: "/forgot-password", component: <ForgetPasswordPage /> },
   { path: "/register", component: <Register /> },
 
   //AuthenticationInner pages

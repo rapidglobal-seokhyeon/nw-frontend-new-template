@@ -14,28 +14,16 @@ const DeleteModal = ({ show, onDeleteClick, onCloseClick }) => {
             style={{ width: "100px", height: "100px" }}
           ></lord-icon>
           <div className="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
-            <h4>Are you sure ?</h4>
-            <p className="text-muted mx-4 mb-0">
-              Are you sure you want to remove this record ?
-            </p>
+            <h4>정말 삭제하시겠습니까 ?</h4>
+            <p className="text-muted mx-4 mb-0">정말 이 데이터를 삭제하시겠습니까?</p>
           </div>
         </div>
         <div className="d-flex gap-2 justify-content-center mt-4 mb-2">
-          <button
-            type="button"
-            className="btn w-sm btn-light"
-            data-bs-dismiss="modal"
-            onClick={onCloseClick}
-          >
-            Close
+          <button type="button" className="btn w-sm btn-light" data-bs-dismiss="modal" onClick={onCloseClick}>
+            닫기
           </button>
-          <button
-            type="button"
-            className="btn w-sm btn-danger "
-            id="delete-record"
-            onClick={onDeleteClick}
-          >
-            Yes, Delete It!
+          <button type="button" className="btn w-sm btn-danger " id="delete-record" onClick={onDeleteClick}>
+            네, 삭제합니다!
           </button>
         </div>
       </ModalBody>

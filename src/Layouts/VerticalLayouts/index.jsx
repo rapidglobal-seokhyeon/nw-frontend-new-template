@@ -82,7 +82,7 @@ const VerticalLayout = (props) => {
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         const initMenu = () => {
-            const pathName = process.env.PUBLIC_URL + path;
+            const pathName = import.meta.env.VITE_PUBLIC_URL + path;
             const ul = document.getElementById("navbar-nav");
             const items = ul.getElementsByTagName("a");
             let itemsArray = [...items]; // converts NodeList to Array

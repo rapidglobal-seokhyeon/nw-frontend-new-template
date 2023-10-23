@@ -46,13 +46,13 @@ const ProfileDropdown = () => {
         <DropdownMenu className="dropdown-menu-end">
           <h6 className="dropdown-header">{userName}님 환영합니다!</h6>
           <DropdownItem className="p-0">
-            <Link to={process.env.PUBLIC_URL + "/profile"} className="dropdown-item">
+            <Link to={import.meta.env.VITE_PUBLIC_URL + "/profile"} className="dropdown-item">
               <i className="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i>
               <span className="align-middle">프로필</span>
             </Link>
           </DropdownItem>
           {/* <DropdownItem className="p-0">
-            <Link to={process.env.PUBLIC_URL + "/apps-chat"} className="dropdown-item">
+            <Link to={import.meta.env.VITE_PUBLIC_URL + "/apps-chat"} className="dropdown-item">
               <i className="mdi mdi-message-text-outline text-muted fs-16 align-middle me-1"></i> <span className="align-middle">Messages</span>
             </Link>
           </DropdownItem>
@@ -62,13 +62,13 @@ const ProfileDropdown = () => {
             </Link>
           </DropdownItem>
           <DropdownItem className="p-0">
-            <Link to={process.env.PUBLIC_URL + "/pages-faqs"} className="dropdown-item">
+            <Link to={import.meta.env.VITE_PUBLIC_URL + "/pages-faqs"} className="dropdown-item">
               <i className="mdi mdi-lifebuoy text-muted fs-16 align-middle me-1"></i> <span className="align-middle">Help</span>
             </Link>
           </DropdownItem>
           <div className="dropdown-divider"></div>
           <DropdownItem className="p-0">
-            <Link to={process.env.PUBLIC_URL + "/pages-profile"} className="dropdown-item">
+            <Link to={import.meta.env.VITE_PUBLIC_URL + "/pages-profile"} className="dropdown-item">
               <i className="mdi mdi-wallet text-muted fs-16 align-middle me-1"></i>{" "}
               <span className="align-middle">
                 Balance : <b>$5971.67</b>
@@ -76,19 +76,19 @@ const ProfileDropdown = () => {
             </Link>
           </DropdownItem>
           <DropdownItem className="p-0">
-            <Link to={process.env.PUBLIC_URL + "/pages-profile-settings"} className="dropdown-item">
+            <Link to={import.meta.env.VITE_PUBLIC_URL + "/pages-profile-settings"} className="dropdown-item">
               <span className="badge bg-success-subtle text-success mt-1 float-end">New</span>
               <i className="mdi mdi-cog-outline text-muted fs-16 align-middle me-1"></i> <span className="align-middle">Settings</span>
             </Link>
           </DropdownItem>
           <DropdownItem className="p-0">
-            <Link to={process.env.PUBLIC_URL + "/auth-lockscreen-basic"} className="dropdown-item">
+            <Link to={import.meta.env.VITE_PUBLIC_URL + "/auth-lockscreen-basic"} className="dropdown-item">
               <i className="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span className="align-middle">Lock screen</span>
             </Link>
           </DropdownItem> */}
           <div className="dropdown-divider"></div>
           <DropdownItem className="p-0">
-            <Link to={process.env.PUBLIC_URL + "/logout"} className="dropdown-item">
+            <Link to={import.meta.env.VITE_PUBLIC_URL + "/logout"} className="dropdown-item">
               <i className="mdi mdi-logout text-muted fs-16 align-middle me-1"></i>{" "}
               <span className="align-middle" data-key="t-logout">
                 로그아웃
