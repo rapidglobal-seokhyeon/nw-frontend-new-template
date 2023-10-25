@@ -37,7 +37,7 @@ import Customer from "../pages/Pages/OrgAdmin/Customer/Customer";
 
 import CuesheetTemplate from "../pages/Pages/OrgAdmin/CuesheetTemplate/CuesheetTemplate";
 
-import Cuesheet from "../pages/Pages/OrgAdmin/Cuesheet/Cuesheet";
+import Cuesheet from "../pages/Pages/OrgAdmin/Cuesheet/index";
 
 import CreateCuesheet from "../pages/Pages/OrgAdmin/CuesheetTemplate/CreateCuesheet";
 import Employee from "../pages/Pages/OrgAdmin/Employee/Employee";

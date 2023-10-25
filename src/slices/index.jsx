@@ -8,6 +8,7 @@ import LoginReducer from "./auth/login/reducer";
 import AccountReducer from "./auth/register/reducer";
 import ForgetPasswordReducer from "./auth/forgetpwd/reducer";
 import ProfileReducer from "./auth/profile/reducer";
+import QsheetReducer from "./qsheet/reducer"
 
 const rootReducer = combineReducers({
     Layout: LayoutReducer,
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
     Account: AccountReducer,
     ForgetPassword: ForgetPasswordReducer,
     Profile: ProfileReducer,
+    Qsheet: QsheetReducer
 });
 
 export default rootReducer;
