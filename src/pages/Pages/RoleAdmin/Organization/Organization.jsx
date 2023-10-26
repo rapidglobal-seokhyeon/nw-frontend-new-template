@@ -1,112 +1,213 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Container } from "reactstrap";
 import { NavLink } from "react-router-dom";
 import { Card, CardBody, CardHeader, Col } from "reactstrap";
 import TableContainer from "../../../../Components/Common/TableContainer";
-import { Designation, Contact, Type, Status } from "./TableCols";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
-// import { getOrganizationList } from "../../../../slices/thunks";
+import { getOrg } from "../../../../slices/thunks";
+import { updateOrgEnabled } from "../../../../helpers/organization_helper";
+// import { Status } from "./TableCols";
 
 const Organization = () => {
+  const [enabled, setEnabled] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [showDangerAlert, setShowDangerAlert] = useState(false);
+
+  // const selectOrgListData = createSelector(state => state);
   const dispatch = useDispatch();
 
-  const selectOrgListData = createSelector(state => state);
+  // const selectOrgListData = createSelector((state) => state);
+  const selectLayoutState = (state) => state.Org;
+  // const appList = useSelector((state) => state.Org.content);
+  // const error = useSelector((state) => state.Org.error)
+  const selectLayoutProperties = createSelector(selectLayoutState, (state) => ({
+    appList: state.content,
+    error: state.error,
+  }));
 
-  const appList = useSelector(selectOrgListData);
-
-  console.log(appList);
+  const { appList, error } = useSelector(selectLayoutProperties);
 
   useEffect(() => {
-    // dispatch(getOrganizationList());
-    console.log(appList);
-  }, [dispatch]);
+    dispatch(getOrg());
+  }, [dispatch, enabled]);
+
+  // useEffect(() => {
+  //   fetchData();
+  // }, [enabled]);
+
+  const onClickSuccessClose = () => {
+    setShowAlert(!showAlert);
+  };
+
+  const onClickDangerClose = () => {
+    setShowDangerAlert(!showAlert);
+  };
+
+  const onClickConfirm = async (e) => {
+    const updateData = e.data.find((a) => a.orgSeq === e.orgSeq);
+    const application = { ...updateData, orgEnabled: !updateData.orgEnabled };
+    setEnabled(!enabled);
+    try {
+      const response = await updateOrgEnabled(e.orgSeq, application);
+      if (response === "success") {
+        console.log(response.status);
+        return setShowAlert(true), dispatch(getOrg());
+      } else {
+        console.log(response.status);
+        return setShowDangerAlert(true);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+    // updateOrgEnabled(e.orgSeq, application)
+    //
+    // location.reload();
+  };
+
+  const onChangeCheckBox = (value, check) => {
+    console.log("value : ", value);
+    console.log("check : ", check);
+    // const element = document.getElementById("email-topbar-actions");
+    // const checkedCount = document.querySelectorAll(
+    //   ".checkbox-wrapper-mail input:checked"
+    // ).length;
+    // const activeList = document.getElementById(value);
+    // if (checkedCount >= 1) {
+    //   element.style.display = "block";
+    // } else {
+    //   element.style.display = "none";
+    // }
+    // if (check) {
+    //   activeList.classList.add("active");
+    // } else {
+    //   activeList.classList.remove("active");
+    // }
+  };
+
+  const Status = (cell) => {
+    return (
+      <React.Fragment>
+        {cell.value === true ? (
+          <button
+            name={cell.row.original.orgSeq}
+            onClick={() => onClickConfirm(cell)}
+            type="button"
+            class="btn btn-soft-success waves-effect waves-light"
+          >
+            승인 완료
+          </button>
+        ) : (
+          <button
+            name={cell.row.original.orgSeq}
+            value={cell.value}
+            onClick={() => onClickConfirm(cell)}
+            type="button"
+            class="btn btn-soft-danger waves-effect waves-light"
+          >
+            진행중
+          </button>
+        )}
+      </React.Fragment>
+    );
+  };
 
   const columns = useMemo(
     () => [
+      // {
+      //   Header: "Check",
+      //   Cell: (cellProps) => {
+      //     // console.log(cellProps);
+      //     return (
+      //       <input
+      //         onChange={(e) => {
+      //           onChangeCheckBox(e.target.value, e.target.checked);
+      //         }}
+      //         className="form-check-input"
+      //         type="checkbox"
+      //         value={cellProps.row.original.orgSeq}
+      //         id={cellProps}
+      //       />
+      //     );
+      //   },
+      // },
       {
-        Header: "Application ID",
-        Cell: appList => (
-          <>
-            <NavLink to="#" className="fw-semibold link-primary">
-              {appList.row.original.aapid}
-            </NavLink>
-          </>
-        ),
-      },
-      {
-        Header: "COMPANY NAME",
-        Cell: appList => (
-          <>
-            <div className="d-flex align-items-center">
-              <div className="flex-grow-1 ms-2 ">{appList.row.original.company[0]}</div>
-            </div>
-          </>
-        ),
-      },
-      {
-        Header: "Designation",
-        accessor: "designation",
+        Header: "조직코드",
+        accessor: "orgSeq",
         filterable: true,
-        Cell: cellProps => {
-          return <Designation {...cellProps} />;
-        },
       },
       {
-        Header: "Apply Date",
-        Cell: appList => (
-          <>
-            {appList.row.original.date} {/* <small className="text-muted">{appList.row.original.time}</small> */}
-            <div>{appList.row.original.time}</div>
-          </>
-        ),
-      },
-      {
-        Header: "Order Value",
-        accessor: "orderValue",
+        Header: "웨딩홀 이름",
         filterable: true,
-        Cell: cellProps => {
-          return <Contact {...cellProps} />;
-          // return <div>{cellProps}</div>;
-        },
+        accessor: "orgName",
       },
       {
-        Header: "Type",
-        accessor: "type",
+        Header: "주소",
+        accessor: "orgAddress",
         filterable: true,
-        Cell: cellProps => {
-          return <Type {...cellProps} />;
-          // return <div>{cellProps}</div>;
-        },
       },
       {
-        Header: "Status",
-        accessor: "status",
+        Header: "연락처",
+        accessor: "orgContact",
         filterable: true,
-        Cell: cellProps => {
-          return <Status {...cellProps} />;
-          // return <div>{cellProps}</div>;
-        },
+      },
+      {
+        Header: "사업자등록번호",
+        accessor: "orgBiznum",
+        filterable: true,
+      },
+      {
+        Header: "승인여부",
+        accessor: "orgEnabled",
+        filterable: true,
+        // Cell: (cellProps) => {
+        //   const orgSeq = cellProps.row.original.orgSeq;
+        //   return <Status {...cellProps} orgSeq={orgSeq} />;
+        // },
       },
     ],
-    [],
+    []
   );
   return (
     <React.Fragment>
       <div className="page-content">
+        {showAlert === true ? (
+          <div
+            class="alert alert-success alert-dismissible fade show"
+            role="alert"
+          >
+            <strong> 승인되었습니다! </strong>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+              onClick={onClickSuccessClose}
+            />
+          </div>
+        ) : null}
+        {showDangerAlert === true ? (
+          <div
+            class="alert alert-danger alert-dismissible fade show"
+            role="alert"
+          >
+            <strong> 승인실패! </strong>
+            <button
+              type="button"
+              onClick={setShowDangerAlert}
+              class="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            />
+          </div>
+        ) : null}
         <Container fluid>
-          <div>조직관리</div>
           <Col lg={12}>
             <Card>
               <CardHeader className="d-flex align-items-center border-0">
-                <h5 className="card-title mb-0 flex-grow-1">All Orders</h5>
-                <div className="flex-shrink-0">
-                  <div className="flax-shrink-0 hstack gap-2">
-                    <button className="btn btn-primary">Today's Orders</button>
-                    <button className="btn btn-soft-info">Past Orders</button>
-                  </div>
-                </div>
+                <h5 className="card-title mb-0 flex-grow-1">조직 관리</h5>
               </CardHeader>
+
               <CardBody>
                 <TableContainer
                   columns={columns}

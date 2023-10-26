@@ -12,3 +12,5 @@ export * from "./organization/thunk";
 
 //Qshhet
 export * from "./qsheet/thunk";
+export * from "./employee/thunks";
+export * from "./Customer/thunk";

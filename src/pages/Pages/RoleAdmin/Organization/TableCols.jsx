@@ -1,5 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { updateOrgEnabled } from "../../../../helpers/organization_helper";
 
 const AppId = (cell) => {
   return (
@@ -26,28 +27,39 @@ const Type = (cell) => {
   return <React.Fragment>{cell.value}</React.Fragment>;
 };
 
-const Status = (cell) => {
-  return (
-    <React.Fragment>
-      {cell.value === "New" ? (
-        <span className="badge bg-info-subtle  text-info text-uppercase">
-          {cell.value}
-        </span>
-      ) : cell.value === "Rejected" ? (
-        <span className="badge bg-danger-subtle  text-danger text-uppercase">
-          {cell.value}
-        </span>
-      ) : cell.value === "Pending" ? (
-        <span className="badge bg-warning-subtle  text-warning text-uppercase">
-          {cell.value}
-        </span>
-      ) : cell.value === "Approved" ? (
-        <span className="badge bg-success-subtle text-success text-uppercase">
-          {cell.value}
-        </span>
-      ) : null}
-    </React.Fragment>
-  );
-};
+// const Status = (cell) => {
+//   // console.log("orgSeq : ", cell.row.original.orgSeq);
+//   const onClickConfirm = (e) => {
+//     const updateData = e.data.find((a) => a.orgSeq === e.orgSeq);
+//     const application = { ...updateData, orgEnabled: !updateData.orgEnabled };
+//     // setEnabled(!enabled);
+//     updateOrgEnabled(e.orgSeq, application);
+//     // location.reload();
+//   };
+//   return (
+//     <React.Fragment>
+//       {cell.value === true ? (
+//         <button
+//           name={cell.row.original.orgSeq}
+//           onClick={() => onClickConfirm(cell)}
+//           type="button"
+//           class="btn btn-soft-success waves-effect waves-light"
+//         >
+//           승인 완료
+//         </button>
+//       ) : (
+//         <button
+//           name={cell.row.original.orgSeq}
+//           value={cell.value}
+//           onClick={() => onClickConfirm(cell)}
+//           type="button"
+//           class="btn btn-soft-danger waves-effect waves-light"
+//         >
+//           진행중
+//         </button>
+//       )}
+//     </React.Fragment>
+//   );
+// };
 
-export { AppId, Name, Designation, Date, Contact, Type, Status };
+export { AppId, Name, Designation, Date, Contact, Type };
