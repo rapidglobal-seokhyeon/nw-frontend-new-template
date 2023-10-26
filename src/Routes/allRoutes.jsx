@@ -43,7 +43,8 @@ import CreateCuesheet from "../pages/Pages/OrgAdmin/CuesheetTemplate/CreateCuesh
 import Employee from "../pages/Pages/OrgAdmin/Employee/Employee";
 import Mypage from "../pages/Pages/OrgAdmin/Mypage/Mypage";
 import DashboardUser from "../pages/Pages/RoleUser/Dashboard/DashboardUser";
-import QsheetUser from "../pages/Pages/RoleUser/Qsheet/QsheetUser";
+// import QsheetUser from "../pages/Pages/RoleUser/Qsheet/QsheetUser";
+import CuesheetUser from "../pages/Pages/RoleUser/Qsheet/CuesheetUser";
 import DocumentUser from "../pages/Pages/RoleUser/Document/DocumentUser";
 import CommunityUser from "../pages/Pages/RoleUser/Community/CommunityUser";
 import MypageUser from "../pages/Pages/RoleUser/Mypage/MypageUser";
@@ -78,7 +79,7 @@ const authProtectedRoutes = [
 
   // ROLE_USER
   { path: "/udashboard", component: <DashboardUser /> }, // 대시보드
-  { path: "/uqsheet", component: <QsheetUser /> }, // 큐시트
+  { path: "/uqsheet", component: <CuesheetUser /> }, // 큐시트
   { path: "/udocument", component: <DocumentUser /> }, // 문서관리
   { path: "/ucommunity", component: <CommunityUser /> }, // 커뮤니티
   { path: "/umypage", component: <MypageUser /> }, // 마이페이지

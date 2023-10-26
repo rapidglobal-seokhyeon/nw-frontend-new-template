@@ -13,14 +13,6 @@ import OrganizationReducer from "./organization/reducer";
 import EmployeeReducer from "./employee/reducer";
 import CustomerReducer from "./Customer/reducer";
 
-// const rootReducer = combineReducers({
-// Layout: LayoutReducer,
-// Login: LoginReducer,
-// Account: AccountReducer,
-// ForgetPassword: ForgetPasswordReducer,
-// Profile: ProfileReducer,
-// Qsheet: QsheetReducer
-
 const rootReducer = combineReducers({
   Layout: LayoutReducer,
   Login: LoginReducer,
