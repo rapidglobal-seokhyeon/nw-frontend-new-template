@@ -7,35 +7,93 @@ import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import { getOrg } from "../../../../slices/thunks";
 import { updateOrgEnabled } from "../../../../helpers/organization_helper";
+import { Status } from "./TableCols";
 
 const Organization = () => {
-  const [enabled, setEnabled] = useState();
+  const [enabled, setEnabled] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [showDangerAlert, setShowDangerAlert] = useState(false);
 
   const dispatch = useDispatch();
 
   // const selectOrgListData = createSelector((state) => state);
+  const selectLayoutState = (state) => state.Org
+  // const appList = useSelector((state) => state.Org.content);
+  // const error = useSelector((state) => state.Org.error)
+  const selectLayoutProperties = createSelector(
+    selectLayoutState,
+    (state) => ({
+      appList: state.content,
+      error: state.error
+    })
+  )
 
-  const appList = useSelector((state) => state.Org.content);
+  const {appList, error} = useSelector(selectLayoutProperties)
 
   useEffect(() => {
     dispatch(getOrg());
-  }, [dispatch]);
+  }, [dispatch, enabled]);
 
-  const onClickConfirm = (e) => {
-    console.log("e : ", e.target.name);
-    console.log("value : ", e.target.value);
-    setEnabled(!e.target.value);
-    updateOrgEnabled(e.target.name, enabled);
+  // useEffect(() => {
+  //   fetchData();
+  // }, [enabled]);
+
+  const onClickSuccessClose = () => {
+    setShowAlert(!showAlert)
+  }
+
+  const onClickDangerClose = () => {
+    setShowDangerAlert(!showAlert)
+  }
+
+  const onClickConfirm = async (e) => {
+    const updateData = e.data.find((a) => a.orgSeq === e.orgSeq);
+    const application = { ...updateData, orgEnabled: !updateData.orgEnabled };
+    setEnabled(!enabled);
+    try {
+      const response = await updateOrgEnabled(e.orgSeq, application);
+      if (response === "success") {
+        console.log(response.status)
+        return (setShowAlert(true), dispatch(getOrg()))
+      } else {
+        console.log(response.status)
+        return(setShowDangerAlert(true))
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+    // updateOrgEnabled(e.orgSeq, application)
+    // 
+    // location.reload();
   };
 
-  const Status = (cell, orgSeq) => {
-    // console.log("orgSeq : ", cell.row.original.orgSeq);
+  const onChangeCheckBox = (value, check) => {
+    console.log("value : ", value);
+    console.log("check : ", check);
+    // const element = document.getElementById("email-topbar-actions");
+    // const checkedCount = document.querySelectorAll(
+    //   ".checkbox-wrapper-mail input:checked"
+    // ).length;
+    // const activeList = document.getElementById(value);
+    // if (checkedCount >= 1) {
+    //   element.style.display = "block";
+    // } else {
+    //   element.style.display = "none";
+    // }
+    // if (check) {
+    //   activeList.classList.add("active");
+    // } else {
+    //   activeList.classList.remove("active");
+    // }
+  };
+
+  const Status = (cell) => {
     return (
       <React.Fragment>
         {cell.value === true ? (
           <button
             name={cell.row.original.orgSeq}
-            onClick={onClickConfirm}
+            onClick={() => onClickConfirm(cell)}
             type="button"
             class="btn btn-soft-success waves-effect waves-light"
           >
@@ -45,7 +103,7 @@ const Organization = () => {
           <button
             name={cell.row.original.orgSeq}
             value={cell.value}
-            onClick={onClickConfirm}
+            onClick={() => onClickConfirm(cell)}
             type="button"
             class="btn btn-soft-danger waves-effect waves-light"
           >
@@ -58,35 +116,37 @@ const Organization = () => {
 
   const columns = useMemo(
     () => [
+      // {
+      //   Header: "Check",
+      //   Cell: (cellProps) => {
+      //     // console.log(cellProps);
+      //     return (
+      //       <input
+      //         onChange={(e) => {
+      //           onChangeCheckBox(e.target.value, e.target.checked);
+      //         }}
+      //         className="form-check-input"
+      //         type="checkbox"
+      //         value={cellProps.row.original.orgSeq}
+      //         id={cellProps}
+      //       />
+      //     );
+      //   },
+      // },
       {
         Header: "조직코드",
-        Cell: (appList) => (
-          <>
-            <NavLink to="#" className="fw-semibold link-primary">
-              {appList.row.original.orgSeq}
-            </NavLink>
-          </>
-        ),
+        accessor: "orgSeq",
+        filterable: true,
       },
       {
         Header: "웨딩홀 이름",
-        Cell: (appList) => (
-          <>
-            <div className="d-flex align-items-center">
-              <div className="flex-grow-1 ms-2 ">
-                {appList.row.original.orgName}
-              </div>
-            </div>
-          </>
-        ),
+        filterable: true,
+        accessor: "orgName",
       },
       {
         Header: "주소",
         accessor: "orgAddress",
         filterable: true,
-        // Cell: (cellProps) => {
-        //   return <Designation {...cellProps} />;
-        // },
       },
       {
         Header: "연락처",
@@ -97,19 +157,6 @@ const Organization = () => {
         Header: "사업자등록번호",
         accessor: "orgBiznum",
         filterable: true,
-        // Cell: (cellProps) => {
-        //   return <Contact {...cellProps} />;
-        //   // return <div>{cellProps}</div>;
-        // },
-      },
-      {
-        Header: "가입 날짜",
-        accessor: "created_at",
-        filterable: true,
-        // Cell: (cellProps) => {
-        //   return <Type {...cellProps} />;
-        //   // return <div>{cellProps}</div>;
-        // },
       },
       {
         Header: "승인여부",
@@ -117,7 +164,6 @@ const Organization = () => {
         filterable: true,
         Cell: (cellProps) => {
           const orgSeq = cellProps.row.original.orgSeq;
-          // console.log(orgSeq);
           return <Status {...cellProps} orgSeq={orgSeq} />;
         },
       },
@@ -127,19 +173,24 @@ const Organization = () => {
   return (
     <React.Fragment>
       <div className="page-content">
+        {showAlert === true ? ( 
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          <strong> 승인되었습니다! </strong> 
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onClick={onClickSuccessClose} />
+        </div>) : null}
+        {showDangerAlert === true ? 
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong> 승인실패! </strong> 
+            <button type="button" onClick={setShowDangerAlert} class="btn-close" data-bs-dismiss="alert" aria-label="Close" />
+          </div>
+          : null}
         <Container fluid>
-          <div>조직관리</div>
           <Col lg={12}>
             <Card>
               <CardHeader className="d-flex align-items-center border-0">
-                <h5 className="card-title mb-0 flex-grow-1">All Orders</h5>
-                <div className="flex-shrink-0">
-                  <div className="flax-shrink-0 hstack gap-2">
-                    <button className="btn btn-primary">Today's Orders</button>
-                    <button className="btn btn-soft-info">Past Orders</button>
-                  </div>
-                </div>
+                <h5 className="card-title mb-0 flex-grow-1">조직 관리</h5>
               </CardHeader>
+
               <CardBody>
                 <TableContainer
                   columns={columns}

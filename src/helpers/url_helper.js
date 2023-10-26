@@ -7,6 +7,13 @@ export const POST_REGISTER = "/api/auth/register";
 // Organization
 export const GET_ORGANIZATION = "/api/v1/org";
 export const PATCH_ORG_ENABLED = "/api/v1/org";
+export const DELETE_ORGANIZATION = "/api/v1/org";
+
+// User인데 일단 연결 해둠 
+export const GET_EMPLOYEES = "/api/v1/user";
+
+// CustomerCard
+export const GET_USERCARD = "/api/v1/usercard"
 
 //PROFILE
 // export const POST_EDIT_JWT_PROFILE = "/post-jwt-profile";
