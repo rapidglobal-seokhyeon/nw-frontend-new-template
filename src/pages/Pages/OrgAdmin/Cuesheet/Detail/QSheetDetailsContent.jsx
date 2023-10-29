@@ -12,7 +12,6 @@ import { useNavigate, useLocation, useParams } from "react-router-dom";
 
 import toast from "@/Components/ui/toast";
 import Tooltip from "@/Components/ui/Tooltip";
-import Input from "@/Components/ui/Input";
 import { useReactToPrint } from "react-to-print";
 import { PERSIST_STORE_NAME } from "@/constants/app.constant";
 import deepParseJson from "@/utils/deepParseJson";
@@ -25,40 +24,36 @@ import Notification from "@/Components/ui/Notification";
 import Button from "@/Components/ui/Button";
 import { getFilesByGroupId } from "@/helpers/File/file_helper";
 import TableContainer from "@/Components/Common/TableContainer";
-import { Container } from "reactstrap";
+import { Container, Input } from "reactstrap";
 import BreadCrumb from "@/Components/Common/BreadCrumb";
 
+import ShareCueSheetModal from "@/Components/Common/ShareCueSheetModal";
+
 const inputStyle = {
-  // border: '1px solid #ccc'
+  border: 0,
   borderRadius: "4px",
   padding: "5px",
   margin: "5px",
   outline: "none",
-  width: "90%",
+  width: "95%",
+  background: "transparent",
 };
 
 const readOnlyStyle = {
   borderRadius: "4px",
   padding: "5px",
   margin: "5px",
-  width: "95%",
-  border: "1px solid rgb(209 213 219)",
-  backgroundColor: "white",
-};
-
-const actorInputStyle = {
-  borderRadius: "4px",
-  padding: "5px",
-  margin: "5px",
   outline: "none",
   width: "95%",
   border: "1px solid rgb(209 213 219)",
-  backgroundColor: "white",
+  backgroundColor: "lightgray",
 };
 
+const actorInputStyle = {};
+
 const QSheetDetailsContent = () => {
-  const [applyCustomStyle, setApplyCustomStyle] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isVisibleShareModal, setIsVisibleShareModal] = useState(false);
   const params = useParams();
   const qsheetSeq = params?.qsheetSeq;
 
@@ -296,7 +291,7 @@ const QSheetDetailsContent = () => {
     const onEdit = () => {
       setDataContent(
         dataContent.map((item) =>
-          item.orderIndex === row.orderIndex
+          item.orderIndex === row.original.orderIndex
             ? { ...item, readOnly: !item.readOnly }
             : item
         )
@@ -304,18 +299,14 @@ const QSheetDetailsContent = () => {
     };
     // 행 삭제
     const onDelete = () => {
-      console.info("dataContent", dataContent);
-      console.info("row", row);
       const rowData = dataContent.find(
         (item) => item.orderIndex == row.original.orderIndex
       );
 
-      console.log(rowData);
       // 데이터를 삭제하고 업데이트된 배열을 생성합니다.
       const updatedData = dataContent.filter(
         (item) => item.orderIndex !== rowData.orderIndex
       );
-      console.info("updatedData", updatedData);
       // 업데이트된 배열을 qSheetExampleData로 설정하여 데이터를 삭제합니다.
       setDataContent(updatedData);
 
@@ -408,12 +399,11 @@ const QSheetDetailsContent = () => {
         Header: "절차",
         accessor: "process",
         Cell: (cell) => (
-          <input
-            className="focus:border border-gray-300"
+          <Input
             type="text"
-            style={cell.row.original.readOnly ? inputStyle : readOnlyStyle}
-            readOnly={isFinalConfirmed || cell.row.original.readOnly}
             defaultValue={cell.row.original.process}
+            style={cell.row.original.readOnly ? readOnlyStyle : inputStyle}
+            readOnly={isFinalConfirmed || cell.row.original.readOnly}
             onBlur={(e) =>
               handleInputChange("process", e.target.value, cell.row.index)
             }
@@ -424,16 +414,15 @@ const QSheetDetailsContent = () => {
         Header: "행위자",
         accessor: "actor",
         Cell: (cell) => (
-          <input
-            className="focus:border border-gray-300"
+          <Input
             type="text"
             style={
-              applyCustomStyle
-                ? {
+              cell.row.original.readOnly
+                ? readOnlyStyle
+                : {
                     ...inputStyle,
                     ...actorInputStyle,
                   }
-                : inputStyle
             }
             readOnly={isFinalConfirmed || cell.row.original.readOnly}
             defaultValue={cell.row.original.actor}
@@ -449,14 +438,9 @@ const QSheetDetailsContent = () => {
         filterable: false,
 
         Cell: (cell) => (
-          <input
-            className="focus:border border-gray-300"
+          <Input
             type="text"
-            style={
-              cell.row.original.readOnly
-                ? inputStyle //contentInputStyle
-                : readOnlyStyle
-            }
+            style={cell.row.original.readOnly ? readOnlyStyle : inputStyle}
             readOnly={isFinalConfirmed || cell.row.original.readOnly}
             defaultValue={cell.row.original.content}
             onBlur={(e) =>
@@ -492,8 +476,11 @@ const QSheetDetailsContent = () => {
             <label
               htmlFor={`fileInput-${cell.row.index}`}
               className="cursor-pointer flex items-center "
+              style={{
+                display: "flex",
+                alignItems: "center",
+              }}
             >
-              &nbsp; &nbsp;
               <HiOutlineUpload className="text-2xl mr-1 " />
               <span
                 id="fileNameDisplay"
@@ -501,7 +488,8 @@ const QSheetDetailsContent = () => {
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
-                  maxWidth: "200px", // 파일명을 표시할 최대 너비 설정
+                  maxWidth: "100px", // 파일명을 표시할 최대 너비 설정
+                  display: "inline-block",
                 }}
               >
                 {cell.row.original.filePath
@@ -518,13 +506,12 @@ const QSheetDetailsContent = () => {
         Header: "비고",
         accessor: "note",
         Cell: (cell) => (
-          <input
-            className="focus:border border-gray-300"
+          <Input
             type="text"
             style={
               cell.row.original.readOnly
-                ? inputStyle //contentInputStyle
-                : readOnlyStyle
+                ? readOnlyStyle //contentInputStyle
+                : inputStyle
             }
             readOnly={isFinalConfirmed || cell.row.original.readOnly}
             defaultValue={cell.row.original.note}
@@ -551,12 +538,28 @@ const QSheetDetailsContent = () => {
 
   return (
     <div className="page-content">
+      <ShareCueSheetModal
+        show={isVisibleShareModal}
+        seq={qsheetSeq}
+        onCloseClick={() => setIsVisibleShareModal(false)}
+      />
       <Container fluid>
         <BreadCrumb title="큐시트 내용" pageTitle="큐시트 내용" />
         <div className="lg:flex items-center justify-between mb-4">
-          <div className="flex flex-col md:flex-row md:items-center gap-1">
+          <div
+            style={{
+              display: "flex",
+              gap: 5,
+              alignItems: "center",
+            }}
+          >
             <span>
-              <Button block size="sm" icon={<HiExternalLink />}>
+              <Button
+                block
+                size="sm"
+                icon={<HiExternalLink />}
+                onClick={() => setIsVisibleShareModal(true)}
+              >
                 공유
               </Button>
             </span>
@@ -603,6 +606,7 @@ const QSheetDetailsContent = () => {
             <TableContainer
               columns={columns}
               data={dataContent}
+              setData={setDataContent}
               // isGlobalFilter={true}
               isAddUserList={false}
               customPageSize={10}
@@ -616,12 +620,7 @@ const QSheetDetailsContent = () => {
           </div>
           <div className="mb-10">
             <div className="mb-4 w-full">
-              <Input
-                textArea
-                className="w-full focus:border border-gray-300 mt-3"
-                // style={inputStyle}
-                value={dataList?.memo}
-              />
+              <Input textArea value={dataList?.memo} />
             </div>
           </div>
         </div>

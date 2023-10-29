@@ -12,7 +12,6 @@ import { useNavigate, useLocation, useParams } from "react-router-dom";
 
 import toast from "@/Components/ui/toast";
 import Tooltip from "@/Components/ui/Tooltip";
-import Input from "@/Components/ui/Input";
 import { useReactToPrint } from "react-to-print";
 import { PERSIST_STORE_NAME } from "@/constants/app.constant";
 import deepParseJson from "@/utils/deepParseJson";
@@ -25,9 +24,10 @@ import Notification from "@/Components/ui/Notification";
 import Button from "@/Components/ui/Button";
 import { getFilesByGroupId } from "@/helpers/File/file_helper";
 import TableContainer from "@/Components/Common/TableContainer";
-import { Container } from "reactstrap";
+import { Container, Input } from "reactstrap";
 import BreadCrumb from "@/Components/Common/BreadCrumb";
 import { ToastContainer } from "react-toastify";
+import ShareCueSheetModal from "@/Components/Common/ShareCueSheetModal";
 
 const inputStyle = {
   // border: '1px solid #ccc'
@@ -60,6 +60,8 @@ const actorInputStyle = {
 const CuesheetUserDetail = () => {
   const [applyCustomStyle, setApplyCustomStyle] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const [isVisibleShareModal, setIsVisibleShareModal] = useState(false);
   const params = useParams();
   const qsheetSeq = params?.qsheetSeq;
 
@@ -297,9 +299,11 @@ const CuesheetUserDetail = () => {
     const { textTheme } = useThemeClass();
 
     const onEdit = () => {
+      console.info("dataContentdataContent", dataContent);
+      console.info("rorw", row.original);
       setDataContent(
         dataContent.map((item) =>
-          item.orderIndex === row.orderIndex
+          item.orderIndex === row.original.orderIndex
             ? { ...item, readOnly: !item.readOnly }
             : item
         )
@@ -308,15 +312,13 @@ const CuesheetUserDetail = () => {
     // 행 삭제
     const onDelete = () => {
       const rowData = dataContent.find(
-        (item) => item.orderIndex == row.orderIndex
+        (item) => item.orderIndex == row.original.orderIndex
       );
 
-      console.log(rowData);
       // 데이터를 삭제하고 업데이트된 배열을 생성합니다.
       const updatedData = dataContent.filter(
         (item) => item.orderIndex !== rowData.orderIndex
       );
-
       // 업데이트된 배열을 qSheetExampleData로 설정하여 데이터를 삭제합니다.
       setDataContent(updatedData);
 
@@ -400,6 +402,7 @@ const CuesheetUserDetail = () => {
   };
   console.info("dataContent", dataContent);
   const [isFinalConfirmed, setIsFinalConfirmed] = useState(false);
+
   const finalButton = () => {
     setIsFinalConfirmed(true);
 
@@ -416,13 +419,12 @@ const CuesheetUserDetail = () => {
         Header: "절차",
         accessor: "process",
         Cell: (cell) => (
-          <input
-            className="focus:border border-gray-300"
+          <Input
             type="text"
-            style={cell.row.original.readOnly ? inputStyle : readOnlyStyle}
+            defaultValue={cell.row.original.process}
+            style={cell.row.original.readOnly ? readOnlyStyle : inputStyle}
             readOnly={isFinalConfirmed || cell.row.original.readOnly}
-            value={cell.row.original.process}
-            onChange={(e) =>
+            onBlur={(e) =>
               handleInputChange("process", e.target.value, cell.row.index)
             }
           />
@@ -432,20 +434,19 @@ const CuesheetUserDetail = () => {
         Header: "행위자",
         accessor: "actor",
         Cell: (cell) => (
-          <input
-            className="focus:border border-gray-300"
+          <Input
             type="text"
             style={
-              applyCustomStyle
-                ? {
+              cell.row.original.readOnly
+                ? readOnlyStyle
+                : {
                     ...inputStyle,
                     ...actorInputStyle,
                   }
-                : inputStyle
             }
             readOnly={isFinalConfirmed || cell.row.original.readOnly}
-            value={cell.row.original.actor}
-            onChange={(e) =>
+            defaultValue={cell.row.original.actor}
+            onBlur={(e) =>
               handleInputChange("actor", e.target.value, cell.row.index)
             }
           />
@@ -457,17 +458,12 @@ const CuesheetUserDetail = () => {
         filterable: false,
 
         Cell: (cell) => (
-          <input
-            className="focus:border border-gray-300"
+          <Input
             type="text"
-            style={
-              cell.row.original.readOnly
-                ? inputStyle //contentInputStyle
-                : readOnlyStyle
-            }
+            style={cell.row.original.readOnly ? readOnlyStyle : inputStyle}
             readOnly={isFinalConfirmed || cell.row.original.readOnly}
-            value={cell.row.original.content}
-            onChange={(e) =>
+            defaultValue={cell.row.original.content}
+            onBlur={(e) =>
               handleInputChange("content", e.target.value, cell.row.index)
             }
           />
@@ -500,8 +496,11 @@ const CuesheetUserDetail = () => {
             <label
               htmlFor={`fileInput-${cell.row.index}`}
               className="cursor-pointer flex items-center "
+              style={{
+                display: "flex",
+                alignItems: "center",
+              }}
             >
-              &nbsp; &nbsp;
               <HiOutlineUpload className="text-2xl mr-1 " />
               <span
                 id="fileNameDisplay"
@@ -509,7 +508,8 @@ const CuesheetUserDetail = () => {
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
-                  maxWidth: "200px", // 파일명을 표시할 최대 너비 설정
+                  maxWidth: "100px", // 파일명을 표시할 최대 너비 설정
+                  display: "inline-block",
                 }}
               >
                 {cell.row.original.filePath
@@ -526,17 +526,16 @@ const CuesheetUserDetail = () => {
         Header: "비고",
         accessor: "note",
         Cell: (cell) => (
-          <input
-            className="focus:border border-gray-300"
+          <Input
             type="text"
             style={
               cell.row.original.readOnly
-                ? inputStyle //contentInputStyle
-                : readOnlyStyle
+                ? readOnlyStyle //contentInputStyle
+                : inputStyle
             }
             readOnly={isFinalConfirmed || cell.row.original.readOnly}
-            value={cell.row.original.note}
-            onChange={(e) =>
+            defaultValue={cell.row.original.note}
+            onBlur={(e) =>
               handleInputChange("note", e.target.value, cell.row.index)
             }
           />
@@ -545,21 +544,44 @@ const CuesheetUserDetail = () => {
       {
         Header: "액션",
         accessor: "action",
-        Cell: (cell) => <ActionColumn row={cell.row} />,
+        Cell: (cell) => (
+          <ActionColumn
+            row={cell.row}
+            dataContent={dataContent}
+            setDataContent={setDataContent}
+          />
+        ),
       },
     ],
-    []
+    [dataContent]
   );
 
+  console.info("dataContent", dataContent);
   return (
     <div className="page-content">
+      <ShareCueSheetModal
+        show={isVisibleShareModal}
+        seq={qsheetSeq}
+        onCloseClick={() => setIsVisibleShareModal(false)}
+      />
       <Container fluid>
         <BreadCrumb title="큐시트 내용" pageTitle="큐시트 내용" />
         <ToastContainer closeButton={false} />
         <div className="lg:flex items-center justify-between mb-4">
-          <div className="flex flex-col md:flex-row md:items-center gap-1">
+          <div
+            style={{
+              display: "flex",
+              gap: 5,
+              alignItems: "center",
+            }}
+          >
             <span>
-              <Button block size="sm" icon={<HiExternalLink />}>
+              <Button
+                block
+                size="sm"
+                icon={<HiExternalLink />}
+                onClick={() => setIsVisibleShareModal(true)}
+              >
                 공유
               </Button>
             </span>

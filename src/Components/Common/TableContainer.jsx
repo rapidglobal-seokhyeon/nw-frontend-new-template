@@ -9,6 +9,7 @@ import {
   useExpanded,
   usePagination,
   useRowSelect,
+  useMountedLayoutEffect,
 } from "react-table";
 import { Table, Row, Col, Button, Input, CardBody } from "reactstrap";
 import { DefaultColumnFilter } from "./filters";
@@ -27,6 +28,26 @@ import {
 } from "../../Components/Common/GlobalSearchFilter";
 import { Link } from "react-router-dom";
 import { forwardRef } from "react";
+import {
+  closestCenter,
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { useMemo } from "react";
+import { DraggableTableRow } from "./DraggableTableRow";
+import { useState } from "react";
+import { StaticTableRow } from "./StaticTableRow";
 
 // Define a default UI for filtering
 function GlobalFilter({
@@ -128,6 +149,7 @@ const TableContainer = forwardRef((props, ref) => {
     thClass,
     divClass,
     SearchPlaceholder,
+    setData,
   } = props;
   const {
     getTableProps,
@@ -145,7 +167,7 @@ const TableContainer = forwardRef((props, ref) => {
     state,
     preGlobalFilteredRows,
     setGlobalFilter,
-    state: { pageIndex, pageSize },
+    state: { pageIndex, pageSize, selectedRowIds },
   } = useTable(
     {
       columns,
@@ -154,7 +176,7 @@ const TableContainer = forwardRef((props, ref) => {
       initialState: {
         pageIndex: 0,
         pageSize: customPageSize,
-        selectedRowIds: 0,
+        selectedRowIds: [],
       },
     },
     useGlobalFilter,
@@ -164,11 +186,14 @@ const TableContainer = forwardRef((props, ref) => {
     usePagination,
     useRowSelect
   );
-  console.info("ree", ref);
+  console.info("selectedRowIds", selectedRowIds);
   const generateSortingIndicator = (column) => {
     return column.isSorted ? (column.isSortedDesc ? " " : "") : "";
   };
 
+  useMountedLayoutEffect(() => {
+    console.log("SELECTED ROWS CHANGED", selectedRowIds);
+  }, [selectedRowIds]);
   const onChangeInSelect = (event) => {
     setPageSize(Number(event.target.value));
   };
@@ -179,6 +204,50 @@ const TableContainer = forwardRef((props, ref) => {
   console.info("page", page);
   console.info("pageOptions", pageOptions);
   console.info("ref", ref);
+  const items = useMemo(() => page?.map(({ id }) => id), [data]);
+  console.info("items", items);
+  const [activeId, setActiveId] = useState();
+  const sensors = useSensors(
+    useSensor(MouseSensor, {}),
+    useSensor(TouchSensor, {}),
+    useSensor(KeyboardSensor, {})
+  );
+
+  function handleDragStart(event) {
+    console.info("event.active.id", event.active.id);
+    setActiveId(event.active.id);
+  }
+
+  function handleDragEnd(event) {
+    const { active, over } = event;
+    console.info({ active, over });
+    if (active.id !== over.id) {
+      setData((data) => {
+        const oldIndex = items.indexOf(active.id);
+        const newIndex = items.indexOf(over.id);
+        console.info("oldIndex", oldIndex);
+        console.info("newIndex", newIndex);
+        return arrayMove(data, oldIndex, newIndex);
+      });
+    }
+
+    setActiveId(null);
+  }
+
+  function handleDragCancel() {
+    setActiveId(null);
+  }
+
+  const selectedRow = useMemo(() => {
+    if (!activeId) {
+      return null;
+    }
+    const row = page.find((item) => item.id === activeId);
+    console.info("asdsasadsada row", row);
+    prepareRow(row);
+    return row;
+  }, [activeId, page, prepareRow]);
+
   return (
     <Fragment>
       <Row className="mb-3">
@@ -262,50 +331,80 @@ const TableContainer = forwardRef((props, ref) => {
           </Col>
         )}
       </Row>
-
+      {selectedRowIds}
       <div className={divClass} ref={ref}>
-        <Table hover {...getTableProps()} className={tableClass}>
-          <thead className={theadClass}>
-            {headerGroups.map((headerGroup) => (
-              <tr
-                className={trClass}
-                key={headerGroup.id}
-                {...headerGroup.getHeaderGroupProps()}
-              >
-                {headerGroup.headers.map((column) => (
-                  <th
-                    key={column.id}
-                    className={thClass}
-                    {...column.getSortByToggleProps()}
-                  >
-                    {column.render("Header")}
-                    {generateSortingIndicator(column)}
-                    {/* <Filter column={column} /> */}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
+        <DndContext
+          sensors={sensors}
+          onDragEnd={handleDragEnd}
+          onDragStart={handleDragStart}
+          onDragCancel={handleDragCancel}
+          collisionDetection={closestCenter}
+          modifiers={[restrictToVerticalAxis]}
+        >
+          <Table hover {...getTableProps()} className={tableClass}>
+            <thead className={theadClass}>
+              {headerGroups.map((headerGroup) => (
+                <tr
+                  className={trClass}
+                  key={headerGroup.id}
+                  {...headerGroup.getHeaderGroupProps()}
+                >
+                  {headerGroup.headers.map((column) => (
+                    <th
+                      key={column.id}
+                      className={thClass}
+                      {...column.getSortByToggleProps()}
+                    >
+                      {column.render("Header")}
+                      {generateSortingIndicator(column)}
+                      {/* <Filter column={column} /> */}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
 
-          <tbody {...getTableBodyProps()}>
-            {page.map((row) => {
-              prepareRow(row);
-              return (
-                <Fragment key={row.getRowProps().key}>
-                  <tr>
-                    {row.cells.map((cell) => {
-                      return (
-                        <td key={cell.id} {...cell.getCellProps()}>
-                          {cell.render("Cell")}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                </Fragment>
-              );
-            })}
-          </tbody>
-        </Table>
+            <tbody {...getTableBodyProps()}>
+              <SortableContext
+                disabled={!setData}
+                items={items}
+                strategy={verticalListSortingStrategy}
+              >
+                {page.map((row) => {
+                  prepareRow(row);
+                  if (!setData) {
+                    return (
+                      <Fragment key={row.getRowProps().key}>
+                        <tr {...row.getRowProps()}>
+                          {row.cells.map((cell) => {
+                            return (
+                              <td key={cell.id} {...cell.getCellProps()}>
+                                {cell.render("Cell")}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      </Fragment>
+                    );
+                  } else {
+                    return (
+                      <DraggableTableRow key={row.original.id} row={row} />
+                    );
+                  }
+                })}
+              </SortableContext>
+            </tbody>
+          </Table>
+          <DragOverlay>
+            {activeId && (
+              <table style={{ width: "100%" }}>
+                <tbody>
+                  <StaticTableRow row={selectedRow} />
+                </tbody>
+              </table>
+            )}
+          </DragOverlay>
+        </DndContext>
       </div>
 
       <Row className="align-items-center mt-2 g-3 text-center text-sm-start">

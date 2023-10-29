@@ -3,7 +3,6 @@ import "regenerator-runtime/runtime";
 
 //import Scss
 import "@/assets/scss/themes.scss";
-
 //imoprt Route
 import Route from "./Routes";
 

@@ -16,26 +16,17 @@ import Notification from "@/Components/ui/Notification";
 import { addQsheetList } from "@/helpers/Cuesheet/cuesheet_helper";
 import TableContainer from "@/Components/Common/TableContainer";
 import { useMemo } from "react";
-import { Container } from "reactstrap";
+import { Container, Input } from "reactstrap";
 import BreadCrumb from "@/Components/Common/BreadCrumb";
 
 const inputStyle = {
-  // border: '1px solid #ccc'
+  border: 0,
   borderRadius: "4px",
   padding: "5px",
   margin: "5px",
   outline: "none",
   width: "95%",
-};
-
-const contentInputStyle = {
-  // border: '1px solid #ccc'
-  borderRadius: "4px",
-  padding: "5px",
-  margin: "5px",
-  outline: "none",
-  width: "95%",
-  overFlow: "hidden",
+  background: "transparent",
 };
 
 const initialData = {
@@ -58,7 +49,6 @@ const NewQSheetContent = () => {
     let allRowsEmpty = false; // 모든 행이 빈 칸인지 여부를 추적
 
     for (const e of dataList) {
-      console.log(e);
       if (
         e.actor === "" &&
         e.content === "" &&
@@ -111,8 +101,6 @@ const NewQSheetContent = () => {
       qsheetData.data = qsheetData.data.concat(requestData[i]);
     }
 
-    console.log(alert(JSON.stringify(qsheetData)));
-
     formData.append(
       "qsheetCreateDto",
       new Blob([JSON.stringify(qsheetData)], {
@@ -148,7 +136,7 @@ const NewQSheetContent = () => {
 
     //  getList();
 
-    navigate("/cuesheet");
+    navigate("/qsheet");
   };
 
   useEffect(() => {
@@ -167,7 +155,7 @@ const NewQSheetContent = () => {
     setDataList(initialDataLists);
   }, []);
 
-  const [dataList, setDataList] = useState([initialData]);
+  const [dataList, setDataList] = useState([{ ...initialData }]);
   const [newData, setNewData] = useState({
     ...initialData,
     orderIndex: 2,
@@ -255,7 +243,7 @@ const NewQSheetContent = () => {
 
       // 데이터를 삭제하고 업데이트된 배열을 생성합니다.
       const updatedData = dataList.filter(
-        (item) => item.orderIndex !== row.original.orderIndex
+        (item) => item.orderIndex !== rowData.orderIndex
       );
       console.log(updatedData);
 
@@ -277,18 +265,7 @@ const NewQSheetContent = () => {
   };
 
   const reset = () => {
-    console.info("initialData", initialData);
-    setDataList([
-      {
-        process: "",
-        actor: "",
-        content: "",
-        filePath: "",
-        note: "",
-        orderIndex: 1,
-        memo: "",
-      },
-    ]);
+    setDataList([...initialData]);
   };
 
   const columns = useMemo(
@@ -297,11 +274,11 @@ const NewQSheetContent = () => {
         Header: "식순명",
         accessor: "process",
         Cell: (cell) => (
-          <input
-            className="focus:border border-gray-300"
+          <Input
             type="text"
-            style={inputStyle}
+            id="userName"
             defaultValue={cell.row.original.process}
+            style={inputStyle}
             onBlur={(e) =>
               handleInputChange("process", e.target.value, cell.row.index)
             }
@@ -312,9 +289,9 @@ const NewQSheetContent = () => {
         Header: "행위자",
         accessor: "actor",
         Cell: (cell) => (
-          <input
-            className="focus:border border-gray-300"
+          <Input
             type="text"
+            id="userName"
             style={inputStyle}
             defaultValue={cell.row.original.actor}
             onBlur={(e) =>
@@ -328,9 +305,9 @@ const NewQSheetContent = () => {
         accessor: "content",
         filterable: false,
         Cell: (cell) => (
-          <input
-            className="focus:border border-gray-300"
+          <Input
             type="text"
+            id="userName"
             style={inputStyle}
             defaultValue={cell.row.original.content}
             onBlur={(e) =>
@@ -365,8 +342,11 @@ const NewQSheetContent = () => {
             <label
               htmlFor={`fileInput-${cell.row.index}`}
               className="cursor-pointer flex items-center "
+              style={{
+                display: "flex",
+                alignItems: "center",
+              }}
             >
-              &nbsp; &nbsp;
               <HiOutlineUpload className="text-2xl mr-1 " />
               <span
                 id="fileNameDisplay"
@@ -374,7 +354,8 @@ const NewQSheetContent = () => {
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
-                  maxWidth: "200px", // 파일명을 표시할 최대 너비 설정
+                  maxWidth: "100px", // 파일명을 표시할 최대 너비 설정
+                  display: "inline-block",
                 }}
               >
                 {cell.row.original.filePath
@@ -391,9 +372,9 @@ const NewQSheetContent = () => {
         Header: "비고",
         accessor: "note",
         Cell: (cell) => (
-          <input
-            className="focus:border border-gray-300"
+          <Input
             type="text"
+            id="userName"
             style={inputStyle}
             defaultValue={cell.row.original.note}
             onBlur={(e) =>

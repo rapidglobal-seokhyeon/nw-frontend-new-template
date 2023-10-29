@@ -9,19 +9,28 @@ import { useState } from "react";
 import { Modal, ModalBody } from "reactstrap";
 import TableContainer from "./TableContainer";
 import { useMemo } from "react";
+import { useReactToPrint } from "react-to-print";
+import { useRef } from "react";
 
-const LoadCueSheetModal = ({ show, onLoadClick, onCloseClick }) => {
+const PrintCueSheetModal = ({ show, onLoadClick, onCloseClick, idList }) => {
   const [address, setAddress] = useState("");
+  const componentRef = useRef();
   const [qsheetList, setQsheetList] = useState([]);
-  const [dataContent, setDataContent] = useState();
+  const [dataContent, setDataContent] = useState([]);
   useEffect(() => {
     async function loadQsheetList() {
-      const result = await getQsheetList();
-      setQsheetList(result.content);
-      console.info("result", result);
+      for (const id of idList) {
+        const result = await getQSheetCardDetails(id);
+        if (result) {
+          console.info("result", result);
+          const responseData = result?.data;
+          console.info("responseData", responseData);
+          setDataContent((prev) => [...prev, ...responseData]);
+        }
+      }
     }
     loadQsheetList();
-  }, []);
+  }, [idList]);
 
   const columns = useMemo(
     () => [
@@ -79,74 +88,32 @@ const LoadCueSheetModal = ({ show, onLoadClick, onCloseClick }) => {
     [dataContent]
   );
 
-  return (
-    <Modal fade={true} isOpen={show} toggle={onCloseClick} centered={true}>
-      <ModalBody className="py-3 px-5">
-        <div
-          className="mt-2 text-center"
-          style={{
-            marginBottom: 20,
-          }}
-        >
-          <lord-icon
-            src="https://cdn.lordicon.com/gsqxdxog.json"
-            trigger="loop"
-            colors="primary:#f7b84b,secondary:#f06548"
-            style={{ width: "100px", height: "100px" }}
-          ></lord-icon>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
-            }}
-          >
-            <h4>불러올 큐시트 주소를 입력해주세요</h4>
-            <input
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="URL"
-              style={{
-                width: "100%",
-                padding: "10px 5px",
-              }}
-            />
-            <select
-              onChange={(e) => setAddress(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px 5px",
-              }}
-            >
-              {" "}
-              <option value="">-----</option>
-              {qsheetList.map((qsheet) => (
-                <option value={qsheet.qsheetSeq}>{qsheet.name}</option>
-              ))}
-            </select>
-            <button
-              type="button"
-              className="btn w-sm btn-danger "
-              id="delete-record"
-              disabled={!address}
-              onClick={async () => {
-                const data = await getQSheetCardDetails(address);
-                if (data) {
-                  console.info("datadata", data);
-                  const responseData = data?.data;
+  const clickPrint = useReactToPrint({
+    content: () => componentRef.current,
+    documentTitle: "CueSheet Content",
+    pageStyle: `
+        @page {
+          size: 30cm 40cm;
+          margin: 1cm;
+        }
+      `,
+  });
 
-                  setDataContent(responseData);
-                }
-              }}
-            >
-              데이터 불러오기
-            </button>
-          </div>
-        </div>
+  return (
+    <Modal
+      fade={true}
+      isOpen={show}
+      toggle={onCloseClick}
+      centered={true}
+      size="xl"
+      fullscreen="xl"
+    >
+      <ModalBody>
         {dataContent && (
           <TableContainer
             columns={columns}
             data={dataContent}
+            ref={componentRef}
             // isGlobalFilter={true}
             isAddUserList={false}
             customPageSize={10}
@@ -172,9 +139,9 @@ const LoadCueSheetModal = ({ show, onLoadClick, onCloseClick }) => {
             type="button"
             className="btn w-sm btn-success"
             id="delete-record"
-            onClick={() => onLoadClick(address)}
+            onClick={clickPrint}
           >
-            불러오기
+            인쇄하기
           </button>
         </div>
       </ModalBody>
@@ -182,10 +149,10 @@ const LoadCueSheetModal = ({ show, onLoadClick, onCloseClick }) => {
   );
 };
 
-LoadCueSheetModal.propTypes = {
+PrintCueSheetModal.propTypes = {
   onCloseClick: PropTypes.func,
   onLoadClick: PropTypes.func,
   show: PropTypes.any,
 };
 
-export default LoadCueSheetModal;
+export default PrintCueSheetModal;

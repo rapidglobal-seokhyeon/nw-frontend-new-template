@@ -31,6 +31,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { useRef } from "react";
 import { deleteQsheetList } from "@/helpers/Cuesheet/cuesheet_helper";
+import PrintCueSheetModal from "@/Components/Common/PrintCueSheetModal";
 
 const Cuesheet = () => {
   const dispatch = useDispatch();
@@ -44,7 +45,8 @@ const Cuesheet = () => {
   // Inside your component
   const qsheetLists = useSelector(selectQsheetData);
   console.log(qsheetLists);
-
+  const [selectedIndex, setSelectedIndex] = useState([]);
+  const [isVisiblePrintModal, setIsVisiblePrintModal] = useState(false);
   const orgSeqList = qsheetLists.map((data) => data?.orgSeq);
   console.log(orgSeqList);
   console.info("qsheetLists", qsheetLists);
@@ -83,16 +85,17 @@ const Cuesheet = () => {
     // }
   };
 
-  const clickPrint = useReactToPrint({
-    content: () => componentRef.current,
-    documentTitle: "CueSheet Content",
-    pageStyle: `
-        @page {
-          size: 30cm 40cm;
-          margin: 1cm;
+  console.info("selectedIndex", selectedIndex);
+  const deleteSelected = async () => {
+    if (selectedIndex.length > 0) {
+      if (window.confirm("정말 삭제하시겠습니까?")) {
+        for (const id of selectedIndex) {
+          await deleteQsheetList(id);
         }
-      `,
-  });
+        dispatch(onGetQsheetList());
+      }
+    }
+  };
 
   const columns = useMemo(
     () => [
@@ -103,8 +106,21 @@ const Cuesheet = () => {
             <input
               type="checkbox"
               className="productCheckBox form-check-input"
-              value={cell.row.original.userSeq}
-              // onClick={() => displayDelete()}
+              checked={selectedIndex.includes(cell.row.original.qsheetSeq)}
+              onClick={() => {
+                if (selectedIndex.includes(cell.row.original.qsheetSeq)) {
+                  setSelectedIndex(
+                    selectedIndex.filter(
+                      (data) => data !== cell.row.original.qsheetSeq
+                    )
+                  );
+                } else {
+                  setSelectedIndex([
+                    ...selectedIndex,
+                    cell.row.original.qsheetSeq,
+                  ]);
+                }
+              }}
             />
           );
         },
@@ -184,54 +200,100 @@ const Cuesheet = () => {
         },
       },
     ],
-    []
+    [selectedIndex]
   );
   return (
     <React.Fragment>
+      <PrintCueSheetModal
+        show={isVisiblePrintModal}
+        idList={selectedIndex}
+        onCloseClick={() => setIsVisiblePrintModal(false)}
+      />
       <div className="page-content">
         <Container fluid>
           <BreadCrumb title="큐시트 목록" pageTitle="큐시트 관리" />
           <Row className="g-4 mb-3">
-            <div className="col-sm-auto">
-              <div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 5,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 5,
+                }}
+              >
                 <Link to="/qsheet-create" className="btn btn-success">
                   <i className="ri-add-line align-bottom me-1"></i>
                   새로 만들기
                 </Link>
-                <button className="btn btn-success" onClick={clickPrint}>
+                <button
+                  className="btn btn-success"
+                  onClick={() => setIsVisiblePrintModal(true)}
+                >
                   인쇄
                 </button>
                 <Link to="/qsheet-history/all" className="btn btn-success">
                   수정내역
                 </Link>
               </div>
-            </div>
-            <div className="col-sm-3 ms-auto">
-              <div className="d-flex justify-content-sm-end gap-2">
-                <div className="search-box ms-2 col-sm-7">
-                  <Input
-                    type="text"
-                    className="form-control"
-                    placeholder="검색어를 입력해주세요."
-                  />
-                  <i className="ri-search-line search-icon"></i>
-                </div>
-
-                <select
-                  className="form-control w-md"
-                  data-choices
-                  data-choices-search-false
+              <div
+                style={{
+                  textAlign: "right",
+                }}
+              >
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 5,
+                    width: 600,
+                    justifyContent: "flex-end",
+                  }}
                 >
-                  <option value="All">전체</option>
-                  <option value="Last 7 Days">지난 7일</option>
-                  <option value="Last 30 Days">지난 30일</option>
-                  <option value="Last Year">작년</option>
-                  <option value="This Month">이번 달</option>
-                  <option value="Today">오늘</option>
-                  <option value="Yesterday" defaultValue>
-                    어제
-                  </option>
-                </select>
+                  {selectedIndex.length > 0 && (
+                    <button className="btn btn-danger" onClick={deleteSelected}>
+                      삭제
+                    </button>
+                  )}
+                  <div
+                    className="search-box"
+                    style={{
+                      flex: 1,
+                    }}
+                  >
+                    <Input
+                      type="text"
+                      className="form-control"
+                      placeholder="검색어를 입력해주세요."
+                    />
+                    <i className="ri-search-line search-icon"></i>
+                  </div>
+
+                  <select
+                    className="form-control"
+                    data-choices
+                    data-choices-search-false
+                    style={{
+                      width: 200,
+                    }}
+                  >
+                    <option value="All">전체</option>
+                    <option value="Last 7 Days">지난 7일</option>
+                    <option value="Last 30 Days">지난 30일</option>
+                    <option value="Last Year">작년</option>
+                    <option value="This Month">이번 달</option>
+                    <option value="Today">오늘</option>
+                    <option value="Yesterday" defaultValue>
+                      어제
+                    </option>
+                  </select>
+                </div>
               </div>
             </div>
           </Row>

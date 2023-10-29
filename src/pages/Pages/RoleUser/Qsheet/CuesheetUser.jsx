@@ -28,10 +28,14 @@ import {
 } from "../../../../slices/thunks";
 import { createSelector } from "reselect";
 import BreadCrumb from "../../../../Components/Common/BreadCrumb";
+import { PERSIST_STORE_NAME } from "@/constants/app.constant";
+import deepParseJson from "@/utils/deepParseJson";
 
 const CuesheetUser = () => {
   const dispatch = useDispatch();
-
+  const rawPersistData = localStorage.getItem(PERSIST_STORE_NAME);
+  const persistData = deepParseJson(rawPersistData);
+  const userSeq = persistData.auth.user.userSeq;
   const selectQsheetData = createSelector(
     (state) => state.Qsheet.qsheetList,
     (qsheetList) => qsheetList
@@ -43,7 +47,11 @@ const CuesheetUser = () => {
   const [deleteModal, setDeleteModal] = useState(false);
 
   useEffect(() => {
-    dispatch(onGetQsheetList());
+    dispatch(
+      onGetQsheetList({
+        userId: userSeq,
+      })
+    );
   }, [dispatch]);
 
   useEffect(() => {
@@ -192,7 +200,9 @@ const CuesheetUser = () => {
                                 </Link>
                               </h5>
                               <div>
-                                <p className="text-muted mb-1">최종승인 여부</p>
+                                <p className="text-muted mb-1">
+                                  최종승인 {item.org_confirm ? "완료" : "전"}
+                                </p>
                                 <div className="fs-12 badge bg-waring-subtle">
                                   {item.org_confirm}
                                 </div>

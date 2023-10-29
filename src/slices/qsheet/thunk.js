@@ -13,9 +13,10 @@ import {
 
 export const getQsheetList = createAsyncThunk(
   "qsheets/getQsheetList",
-  async () => {
+  async (params) => {
     try {
-      const response = getQsheetListApi();
+      console.info("params params", params);
+      const response = getQsheetListApi(params);
       return response;
     } catch (error) {
       return error;

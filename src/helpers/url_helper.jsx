@@ -25,3 +25,6 @@ export const GET_QSHEET_HISTORY_LIST = "/api/v1/qsheetHistory";
 
 //File
 export const GET_FILES_LIST = "/api/v1/file/downloads";
+
+//ORG
+export const GET_ORG_LIST = "/api/v1/org";

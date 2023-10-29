@@ -3,8 +3,8 @@ import * as url from "../url_helper";
 
 const api = new APIClient();
 
-export const getQsheetList = () => {
-  return api.get(url.GET_QSHEET_LIST).catch((err) => {
+export const getQsheetList = (params) => {
+  return api.get(url.GET_QSHEET_LIST, params).catch((err) => {
     var message;
     if (err.response && err.response.status) {
       switch (err.response.status) {

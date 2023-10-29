@@ -19,11 +19,18 @@ import {
 } from "@/helpers/Cuesheet/cuesheet_helper";
 import TableContainer from "@/Components/Common/TableContainer";
 import { useMemo } from "react";
-import { Container } from "reactstrap";
+import {
+  Container,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  Input,
+} from "reactstrap";
 import BreadCrumb from "@/Components/Common/BreadCrumb";
 import { ToastContainer } from "react-toastify";
 import LoadCueSheetModal from "@/Components/Common/LoadCueSheetModal";
-import { getCustomerList } from "@/helpers/customer_helper";
+import { apiGetOrgList } from "@/helpers/Org/org_helper";
 
 const inputStyle = {
   // border: '1px solid #ccc'
@@ -59,6 +66,7 @@ const CreateCuesheetUser = () => {
   const persistData = deepParseJson(rawPersistData);
   console.info("persistData", persistData);
   const userSeq = persistData.auth.user.userSeq;
+  const [qsheetName, setQsheetName] = useState("");
   const [isOpenLoadModal, setIsOpenLoadModal] = useState(false);
 
   const onConfirm = () => {
@@ -95,10 +103,13 @@ const CreateCuesheetUser = () => {
     const name = "큐시트_" + date.toLocaleDateString("ko-kr");
 
     const qsheetData = {
-      name: name,
+      name: qsheetName,
       userSeq: userSeq,
+      orgSeq: currentOrg.orgSeq,
       data: [],
+      memo: secretMemo,
     };
+
     const addData = [];
     const formData = new FormData();
 
@@ -117,8 +128,6 @@ const CreateCuesheetUser = () => {
 
       qsheetData.data = qsheetData.data.concat(requestData[i]);
     }
-
-    console.log(alert(JSON.stringify(qsheetData)));
 
     formData.append(
       "qsheetCreateDto",
@@ -155,7 +164,7 @@ const CreateCuesheetUser = () => {
 
     //  getList();
 
-    navigate("/cuesheet");
+    navigate("/uqsheet");
   };
 
   useEffect(() => {
@@ -173,8 +182,10 @@ const CreateCuesheetUser = () => {
     ];
     setDataList(initialDataLists);
   }, []);
-
-  const [dataList, setDataList] = useState([initialData]);
+  const [isOrgVisible, setIsOrgVisible] = useState(false);
+  const [orgList, setOrgList] = useState([]);
+  const [currentOrg, setOrg] = useState();
+  const [dataList, setDataList] = useState([{ ...initialData }]);
   const [newData, setNewData] = useState({
     ...initialData,
     orderIndex: 2,
@@ -254,18 +265,18 @@ const CreateCuesheetUser = () => {
 
     const onDelete = (orderIndex) => {
       //삭제할 데이터 찾기
-      const rowData = dataList.find((item) => item.orderIndex === row.index);
-      console.log(rowData);
+      const rowData = dataList.find(
+        (item) => item.orderIndex === row.original.orderIndex
+      );
 
       // 데이터를 삭제하고 업데이트된 배열을 생성합니다.
       const updatedData = dataList.filter(
-        (item) => item.orderIndex !== row.index
+        (item) => item.orderIndex !== rowData.orderIndex
       );
       console.log(updatedData);
 
       setDataList(updatedData);
     };
-
     return (
       <div className="inset-0 flex items-center justify-center text-lg">
         <Tooltip title="삭제">
@@ -281,7 +292,8 @@ const CreateCuesheetUser = () => {
   };
 
   const reset = () => {
-    setDataList([initialData]);
+    console.info("initialData", initialData);
+    setDataList([{ ...initialData }]);
   };
 
   const loadCueSheet = async (id) => {
@@ -290,18 +302,32 @@ const CreateCuesheetUser = () => {
     setIsOpenLoadModal(false);
   };
 
+  useEffect(() => {
+    async function load() {
+      const response = await apiGetOrgList();
+      if (response.content) {
+        const optionList = [];
+        for (const res of response.content) {
+          optionList.push({ ...res });
+        }
+        setOrgList(optionList);
+      }
+    }
+    load();
+  }, []);
+
   const columns = useMemo(
     () => [
       {
         Header: "식순명",
         accessor: "process",
         Cell: (cell) => (
-          <input
-            className="focus:border border-gray-300"
+          <Input
             type="text"
+            id="userName"
+            defaultValue={cell.row.original.process}
             style={inputStyle}
-            value={cell.row.original.process}
-            onChange={(e) =>
+            onBlur={(e) =>
               handleInputChange("process", e.target.value, cell.row.index)
             }
           />
@@ -311,12 +337,12 @@ const CreateCuesheetUser = () => {
         Header: "행위자",
         accessor: "actor",
         Cell: (cell) => (
-          <input
-            className="focus:border border-gray-300"
+          <Input
             type="text"
+            id="userName"
             style={inputStyle}
-            value={cell.row.original.actor}
-            onChange={(e) =>
+            defaultValue={cell.row.original.actor}
+            onBlur={(e) =>
               handleInputChange("actor", e.target.value, cell.row.index)
             }
           />
@@ -327,12 +353,12 @@ const CreateCuesheetUser = () => {
         accessor: "content",
         filterable: false,
         Cell: (cell) => (
-          <input
-            className="focus:border border-gray-300"
+          <Input
             type="text"
+            id="userName"
             style={inputStyle}
-            value={cell.row.original.content}
-            onChange={(e) =>
+            defaultValue={cell.row.original.content}
+            onBlur={(e) =>
               handleInputChange("content", e.target.value, cell.row.index)
             }
           />
@@ -364,8 +390,11 @@ const CreateCuesheetUser = () => {
             <label
               htmlFor={`fileInput-${cell.row.index}`}
               className="cursor-pointer flex items-center "
+              style={{
+                display: "flex",
+                alignItems: "center",
+              }}
             >
-              &nbsp; &nbsp;
               <HiOutlineUpload className="text-2xl mr-1 " />
               <span
                 id="fileNameDisplay"
@@ -373,7 +402,8 @@ const CreateCuesheetUser = () => {
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
-                  maxWidth: "200px", // 파일명을 표시할 최대 너비 설정
+                  maxWidth: "100px", // 파일명을 표시할 최대 너비 설정
+                  display: "inline-block",
                 }}
               >
                 {cell.row.original.filePath
@@ -390,12 +420,12 @@ const CreateCuesheetUser = () => {
         Header: "비고",
         accessor: "note",
         Cell: (cell) => (
-          <input
-            className="focus:border border-gray-300"
+          <Input
             type="text"
+            id="userName"
             style={inputStyle}
-            value={cell.row.original.note}
-            onChange={(e) =>
+            defaultValue={cell.row.original.note}
+            onBlur={(e) =>
               handleInputChange("note", e.target.value, cell.row.index)
             }
           />
@@ -407,7 +437,7 @@ const CreateCuesheetUser = () => {
         Cell: (cell) => <ActionColumn row={cell.row} />,
       },
     ],
-    []
+    [dataList]
   );
 
   return (
@@ -438,6 +468,48 @@ const CreateCuesheetUser = () => {
         />
 
         <div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              width: 200,
+              gap: 10,
+            }}
+          >
+            <Input
+              placeholder="큐시트 이름"
+              value={qsheetName}
+              onChange={(e) => setQsheetName(e.target.value)}
+            />
+            <Dropdown
+              isOpen={isOrgVisible}
+              style={{
+                width: "100%",
+              }}
+            >
+              <DropdownToggle
+                caret
+                onClick={() => setIsOrgVisible(true)}
+                style={{
+                  width: "100%",
+                }}
+              >
+                {currentOrg?.orgName ?? "업체 검색"}
+              </DropdownToggle>
+              <DropdownMenu>
+                {orgList.map((item) => (
+                  <DropdownItem
+                    onClick={() => {
+                      setOrg(item);
+                      setIsOrgVisible(false);
+                    }}
+                  >
+                    {item.orgName}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+          </div>
           <TableContainer
             columns={columns}
             data={dataList}
