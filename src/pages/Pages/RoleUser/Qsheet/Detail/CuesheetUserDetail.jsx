@@ -209,6 +209,8 @@ const CuesheetUserDetail = () => {
     } else {
       className = "text-purple-600"; // 다른 필드에 대한 클래스 설정
     }
+    console.info("updatedDataList", updatedDataList);
+    console.info("index", index);
     updatedDataList[index][field] = value;
     setDataContent(updatedDataList);
   };

@@ -205,6 +205,8 @@ const QSheetDetailsContent = () => {
     } else {
       className = "text-purple-600"; // 다른 필드에 대한 클래스 설정
     }
+    console.info("updatedDataList", updatedDataList);
+    console.info("index", index);
     updatedDataList[index][field] = value;
     setDataContent(updatedDataList);
   };
@@ -304,7 +306,9 @@ const QSheetDetailsContent = () => {
     const onDelete = () => {
       console.info("dataContent", dataContent);
       console.info("row", row);
-      const rowData = dataContent.find((item) => item.orderIndex == row.index);
+      const rowData = dataContent.find(
+        (item) => item.orderIndex == row.original.orderIndex
+      );
 
       console.log(rowData);
       // 데이터를 삭제하고 업데이트된 배열을 생성합니다.
@@ -409,8 +413,8 @@ const QSheetDetailsContent = () => {
             type="text"
             style={cell.row.original.readOnly ? inputStyle : readOnlyStyle}
             readOnly={isFinalConfirmed || cell.row.original.readOnly}
-            value={cell.row.original.process}
-            onChange={(e) =>
+            defaultValue={cell.row.original.process}
+            onBlur={(e) =>
               handleInputChange("process", e.target.value, cell.row.index)
             }
           />
@@ -432,8 +436,8 @@ const QSheetDetailsContent = () => {
                 : inputStyle
             }
             readOnly={isFinalConfirmed || cell.row.original.readOnly}
-            value={cell.row.original.actor}
-            onChange={(e) =>
+            defaultValue={cell.row.original.actor}
+            onBlur={(e) =>
               handleInputChange("actor", e.target.value, cell.row.index)
             }
           />
@@ -454,8 +458,8 @@ const QSheetDetailsContent = () => {
                 : readOnlyStyle
             }
             readOnly={isFinalConfirmed || cell.row.original.readOnly}
-            value={cell.row.original.content}
-            onChange={(e) =>
+            defaultValue={cell.row.original.content}
+            onBlur={(e) =>
               handleInputChange("content", e.target.value, cell.row.index)
             }
           />
@@ -523,8 +527,8 @@ const QSheetDetailsContent = () => {
                 : readOnlyStyle
             }
             readOnly={isFinalConfirmed || cell.row.original.readOnly}
-            value={cell.row.original.note}
-            onChange={(e) =>
+            defaultValue={cell.row.original.note}
+            onBlur={(e) =>
               handleInputChange("note", e.target.value, cell.row.index)
             }
           />
@@ -542,7 +546,7 @@ const QSheetDetailsContent = () => {
         ),
       },
     ],
-    []
+    [dataContent]
   );
 
   return (

@@ -155,11 +155,6 @@ const TableContainer = forwardRef((props, ref) => {
         pageIndex: 0,
         pageSize: customPageSize,
         selectedRowIds: 0,
-        sortBy: [
-          {
-            desc: true,
-          },
-        ],
       },
     },
     useGlobalFilter,

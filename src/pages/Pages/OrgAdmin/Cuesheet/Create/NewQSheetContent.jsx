@@ -248,12 +248,14 @@ const NewQSheetContent = () => {
 
     const onDelete = (orderIndex) => {
       //삭제할 데이터 찾기
-      const rowData = dataList.find((item) => item.orderIndex === row.index);
-      console.log(rowData);
+
+      const rowData = dataList.find(
+        (item) => item.orderIndex === row.original.orderIndex
+      );
 
       // 데이터를 삭제하고 업데이트된 배열을 생성합니다.
       const updatedData = dataList.filter(
-        (item) => item.orderIndex !== row.index
+        (item) => item.orderIndex !== row.original.orderIndex
       );
       console.log(updatedData);
 
@@ -299,8 +301,8 @@ const NewQSheetContent = () => {
             className="focus:border border-gray-300"
             type="text"
             style={inputStyle}
-            value={cell.row.original.process}
-            onChange={(e) =>
+            defaultValue={cell.row.original.process}
+            onBlur={(e) =>
               handleInputChange("process", e.target.value, cell.row.index)
             }
           />
@@ -314,8 +316,8 @@ const NewQSheetContent = () => {
             className="focus:border border-gray-300"
             type="text"
             style={inputStyle}
-            value={cell.row.original.actor}
-            onChange={(e) =>
+            defaultValue={cell.row.original.actor}
+            onBlur={(e) =>
               handleInputChange("actor", e.target.value, cell.row.index)
             }
           />
@@ -330,8 +332,8 @@ const NewQSheetContent = () => {
             className="focus:border border-gray-300"
             type="text"
             style={inputStyle}
-            value={cell.row.original.content}
-            onChange={(e) =>
+            defaultValue={cell.row.original.content}
+            onBlur={(e) =>
               handleInputChange("content", e.target.value, cell.row.index)
             }
           />
@@ -393,8 +395,8 @@ const NewQSheetContent = () => {
             className="focus:border border-gray-300"
             type="text"
             style={inputStyle}
-            value={cell.row.original.note}
-            onChange={(e) =>
+            defaultValue={cell.row.original.note}
+            onBlur={(e) =>
               handleInputChange("note", e.target.value, cell.row.index)
             }
           />
@@ -406,7 +408,7 @@ const NewQSheetContent = () => {
         Cell: (cell) => <ActionColumn row={cell.row} />,
       },
     ],
-    []
+    [dataList]
   );
 
   return (
