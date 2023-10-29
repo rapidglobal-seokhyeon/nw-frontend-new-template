@@ -27,6 +27,7 @@ import { getFilesByGroupId } from "@/helpers/File/file_helper";
 import TableContainer from "@/Components/Common/TableContainer";
 import { Container } from "reactstrap";
 import BreadCrumb from "@/Components/Common/BreadCrumb";
+import { ToastContainer } from "react-toastify";
 
 const inputStyle = {
   // border: '1px solid #ccc'
@@ -56,7 +57,7 @@ const actorInputStyle = {
   backgroundColor: "white",
 };
 
-const QSheetDetailsContent = () => {
+const CuesheetUserDetail = () => {
   const [applyCustomStyle, setApplyCustomStyle] = useState(false);
   const [loading, setLoading] = useState(false);
   const params = useParams();
@@ -68,9 +69,12 @@ const QSheetDetailsContent = () => {
   }, []);
 
   const fetchData = async () => {
+    console.info("qsheetSeq", qsheetSeq);
+
     if (qsheetSeq) {
       setLoading(true);
       const data = await getQSheetCardDetails(qsheetSeq);
+      console.info("response", data);
       if (data) {
         const res = data;
         const responseData = data?.data;
@@ -546,6 +550,7 @@ const QSheetDetailsContent = () => {
     <div className="page-content">
       <Container fluid>
         <BreadCrumb title="큐시트 내용" pageTitle="큐시트 내용" />
+        <ToastContainer closeButton={false} />
         <div className="lg:flex items-center justify-between mb-4">
           <div className="flex flex-col md:flex-row md:items-center gap-1">
             <span>
@@ -568,6 +573,7 @@ const QSheetDetailsContent = () => {
                 저장
               </Button>
             </span>
+
             <span>
               <Button
                 block
@@ -623,4 +629,4 @@ const QSheetDetailsContent = () => {
   );
 };
 
-export default QSheetDetailsContent;
+export default CuesheetUserDetail;

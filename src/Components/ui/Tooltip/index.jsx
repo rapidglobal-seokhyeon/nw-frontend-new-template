@@ -66,7 +66,7 @@ const Tooltip = (props) => {
               {
                 name: "arrow",
                 options: {
-                  element,
+                  element: Arrow,
                 },
               },
               { name: "offset", options: { offset: [0, 7] } },

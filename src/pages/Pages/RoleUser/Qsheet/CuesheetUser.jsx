@@ -82,10 +82,11 @@ const CuesheetUser = () => {
             onDeleteClick={() => handleDeleteQsheetList()}
             onCloseClick={() => setDeleteModal(false)}
           />
+
           <Row className="g-4 mb-3">
             <div className="col-sm-auto">
               <div>
-                <Link to="/qsheet-create" className="btn btn-success">
+                <Link to="/uqsheet/create" className="btn btn-success">
                   <i className="ri-add-line align-bottom me-1"></i> 새로 만들기
                 </Link>
               </div>
@@ -184,7 +185,7 @@ const CuesheetUser = () => {
                             <div className="flex-grow-1">
                               <h5 className="mb-1 fs-15">
                                 <Link
-                                  to="/apps-projects-overview"
+                                  to={`/uqsheet/detail/${item.qsheetSeq}`}
                                   className="text-body"
                                 >
                                   {item.name}

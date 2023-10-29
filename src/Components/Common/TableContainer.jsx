@@ -26,6 +26,7 @@ import {
   TaskListGlobalFilter,
 } from "../../Components/Common/GlobalSearchFilter";
 import { Link } from "react-router-dom";
+import { forwardRef } from "react";
 
 // Define a default UI for filtering
 function GlobalFilter({
@@ -97,36 +98,37 @@ function GlobalFilter({
   );
 }
 
-const TableContainer = ({
-  columns,
-  data,
-  isGlobalSearch,
-  isGlobalFilter,
-  isProductsFilter,
-  isCustomerFilter,
-  isOrderFilter,
-  isContactsFilter,
-  isCompaniesFilter,
-  isLeadsFilter,
-  isCryptoOrdersFilter,
-  isInvoiceListFilter,
-  isTicketsListFilter,
-  isNFTRankingFilter,
-  isTaskListFilter,
-  isAddOptions,
-  isAddUserList,
-  handleOrderClicks,
-  handleUserClick,
-  handleCustomerClick,
-  isAddCustList,
-  customPageSize,
-  tableClass,
-  theadClass,
-  trClass,
-  thClass,
-  divClass,
-  SearchPlaceholder,
-}) => {
+const TableContainer = forwardRef((props, ref) => {
+  const {
+    columns,
+    data,
+    isGlobalSearch,
+    isGlobalFilter,
+    isProductsFilter,
+    isCustomerFilter,
+    isOrderFilter,
+    isContactsFilter,
+    isCompaniesFilter,
+    isLeadsFilter,
+    isCryptoOrdersFilter,
+    isInvoiceListFilter,
+    isTicketsListFilter,
+    isNFTRankingFilter,
+    isTaskListFilter,
+    isAddOptions,
+    isAddUserList,
+    handleOrderClicks,
+    handleUserClick,
+    handleCustomerClick,
+    isAddCustList,
+    customPageSize,
+    tableClass,
+    theadClass,
+    trClass,
+    thClass,
+    divClass,
+    SearchPlaceholder,
+  } = props;
   const {
     getTableProps,
     getTableBodyProps,
@@ -167,7 +169,7 @@ const TableContainer = ({
     usePagination,
     useRowSelect
   );
-
+  console.info("ree", ref);
   const generateSortingIndicator = (column) => {
     return column.isSorted ? (column.isSortedDesc ? " " : "") : "";
   };
@@ -180,6 +182,8 @@ const TableContainer = ({
     gotoPage(page);
   };
   console.info("page", page);
+  console.info("pageOptions", pageOptions);
+  console.info("ref", ref);
   return (
     <Fragment>
       <Row className="mb-3">
@@ -264,7 +268,7 @@ const TableContainer = ({
         )}
       </Row>
 
-      <div className={divClass}>
+      <div className={divClass} ref={ref}>
         <Table hover {...getTableProps()} className={tableClass}>
           <thead className={theadClass}>
             {headerGroups.map((headerGroup) => (
@@ -350,7 +354,7 @@ const TableContainer = ({
       </Row>
     </Fragment>
   );
-};
+});
 
 TableContainer.propTypes = {
   preGlobalFilteredRows: PropTypes.any,

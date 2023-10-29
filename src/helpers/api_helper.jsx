@@ -77,18 +77,24 @@ class APIClient {
   /**
    * post given data to url
    */
-  create = (url, data) => {
-    return axios.post(url, data);
+  create = (url, data, headers) => {
+    return axios.post(url, data, {
+      headers,
+    });
   };
   /**
    * Updates data
    */
-  update = (url, data) => {
-    return axios.patch(url, data);
+  update = (url, data, headers) => {
+    return axios.patch(url, data, {
+      headers,
+    });
   };
 
-  put = (url, data) => {
-    return axios.put(url, data);
+  put = (url, data, headers) => {
+    return axios.put(url, data, {
+      headers,
+    });
   };
   /**
    * Delete

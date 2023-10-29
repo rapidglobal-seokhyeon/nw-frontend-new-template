@@ -15,50 +15,43 @@ import {
   Label,
   Row,
 } from "reactstrap";
-import TableContainer from "../../../../Components/Common/TableContainer";
-
-//Import Icons
-import FeatherIcon from "feather-icons-react";
+import TableContainer from "@components/Common/TableContainer";
 
 //import action
 import {
-  getQsheetList as onGetQsheetList,
+  getQsheetLogList as onGetQsheetHistoryList,
   deleteQsheetList as onDeleteQsheetList,
-} from "../../../../slices/thunks";
+} from "../../../../../slices/thunks";
 import { createSelector } from "reselect";
-import BreadCrumb from "../../../../Components/Common/BreadCrumb";
+import BreadCrumb from "@components/Common/BreadCrumb";
 import { Link, useNavigate } from "react-router-dom";
-import { useReactToPrint } from "react-to-print";
-import { useRef } from "react";
 
-const Cuesheet = () => {
+const CuesheetLog = () => {
   const dispatch = useDispatch();
 
   const selectQsheetData = createSelector(
-    (state) => state.Qsheet.qsheetList,
-    (qsheetList) => qsheetList
+    (state) => state.Qsheet.qsheetLogList,
+    (qsheetLogList) => qsheetLogList
   );
-  const componentRef = useRef(null);
-
   // Inside your component
-  const qsheetLists = useSelector(selectQsheetData);
-  console.log(qsheetLists);
+  const qsheetLogList = useSelector(selectQsheetData);
+  console.log(qsheetLogList);
 
-  const orgSeqList = qsheetLists.map((data) => data?.orgSeq);
+  const orgSeqList = qsheetLogList.map((data) => data?.orgSeq);
   console.log(orgSeqList);
-  console.info("qsheetLists", qsheetLists);
+  console.info("qsheetLogList", qsheetLogList);
   const [qsheet, setQsheet] = useState(null);
   const [deleteModal, setDeleteModal] = useState(false);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(onGetQsheetList());
+    dispatch(onGetQsheetHistoryList());
   }, [dispatch]);
 
   useEffect(() => {
-    setQsheet(qsheetLists);
-  }, [qsheetLists]);
+    setQsheet(qsheetLogList);
+  }, [qsheetLogList]);
 
   const [modal, setModal] = useState(false);
 
@@ -82,113 +75,32 @@ const Cuesheet = () => {
     // }
   };
 
-  const clickPrint = useReactToPrint({
-    content: () => componentRef.current,
-    documentTitle: "CueSheet Content",
-    pageStyle: `
-        @page {
-          size: 30cm 40cm;
-          margin: 1cm;
-        }
-      `,
-  });
-
   const columns = useMemo(
     () => [
       {
-        Header: "#",
+        Header: "수정내용",
+        accessor: "content",
+        filterable: true,
         Cell: (cell) => {
+          console.info("cell.row.original", cell.row.original.content);
           return (
-            <input
-              type="checkbox"
-              className="productCheckBox form-check-input"
-              value={cell.row.original.userSeq}
-              // onClick={() => displayDelete()}
-            />
+            <div>
+              {cell.row.original.content?.map((data) => (
+                <div>{data.content}</div>
+              ))}
+            </div>
           );
         },
       },
       {
-        Header: "큐시트 이름",
-        accessor: "name",
-        filterable: true,
-        Cell: (cell) => {
-          console.info("cell", cell);
-          return (
-            <Link
-              to={`/qsheet-detail/${cell.row.original.qsheetSeq}`}
-              className="text-body fw-bold"
-            >
-              {cell.row.original.name}
-            </Link>
-          );
-        },
-      },
-      {
-        Header: "작성자 이름",
-        accessor: "userName",
+        Header: "수정자 이름",
+        accessor: "user.userName",
         filterable: true,
       },
       {
-        Header: "관리자 이름",
-        accessor: "orgName",
-        filterable: true,
-      },
-      {
-        Header: "생성일 ",
-        accessor: "created_at",
+        Header: "수정일 ",
+        accessor: "updated_at",
         filterable: false,
-      },
-
-      {
-        Header: "Action",
-        Cell: (cellProps) => {
-          console.log("userSeq : ", cellProps.row.original.userSeq);
-          return (
-            <UncontrolledDropdown>
-              <DropdownToggle
-                href="#"
-                className="btn btn-soft-secondary btn-sm"
-                tag="button"
-              >
-                <i className="ri-more-fill" />
-              </DropdownToggle>
-              <DropdownMenu className="dropdown-menu-end">
-                <DropdownItem href="apps-ecommerce-product-details">
-                  <i className="ri-eye-fill align-bottom me-2 text-muted"></i>{" "}
-                  View
-                </DropdownItem>
-
-                <DropdownItem onClick={toggleEdit} isOpen={modal}>
-                  <i className="ri-pencil-fill align-bottom me-2 text-muted"></i>{" "}
-                  Edit
-                </DropdownItem>
-
-                <DropdownItem divider />
-                <DropdownItem
-                  href="#"
-                  onClick={() => {
-                    const productData = cellProps.row.original;
-                    onClickDelete(productData);
-                  }}
-                >
-                  <i className="ri-delete-bin-fill align-bottom me-2 text-muted"></i>{" "}
-                  Delete
-                </DropdownItem>
-                <DropdownItem
-                  onClick={() => {
-                    navigate(
-                      `/qsheet-history/${cellProps.row.original.qsheetSeq}`
-                    );
-                  }}
-                >
-                  <i className="ri-delete-bin-fill align-bottom me-2 text-muted"></i>
-                  수정로그
-                </DropdownItem>
-              </DropdownMenu>
-            </UncontrolledDropdown>
-          );
-        },
       },
     ],
     []
@@ -197,19 +109,8 @@ const Cuesheet = () => {
     <React.Fragment>
       <div className="page-content">
         <Container fluid>
-          <BreadCrumb title="큐시트 목록" pageTitle="큐시트 관리" />
+          <BreadCrumb title="큐시트 수정내역" pageTitle="큐시트 수정내역" />
           <Row className="g-4 mb-3">
-            <div className="col-sm-auto">
-              <div>
-                <Link to="/qsheet-create" className="btn btn-success">
-                  <i className="ri-add-line align-bottom me-1"></i>
-                  새로 만들기
-                </Link>
-                <button className="btn btn-success" onClick={clickPrint}>
-                  인쇄
-                </button>
-              </div>
-            </div>
             <div className="col-sm-3 ms-auto">
               <div className="d-flex justify-content-sm-end gap-2">
                 <div className="search-box ms-2 col-sm-7">
@@ -242,11 +143,10 @@ const Cuesheet = () => {
           <div className="card-body pt-0">
             <Card>
               <CardBody>
-                {qsheetLists && qsheetLists.length > 0 ? (
+                {qsheetLogList && qsheetLogList.length > 0 ? (
                   <TableContainer
                     columns={columns}
-                    data={qsheetLists || []}
-                    ref={componentRef}
+                    data={qsheetLogList || []}
                     // isGlobalFilter={true}
                     isAddUserList={false}
                     customPageSize={10}
@@ -290,4 +190,4 @@ const Cuesheet = () => {
   );
 };
 
-export default Cuesheet;
+export default CuesheetLog;

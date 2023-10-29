@@ -13,11 +13,17 @@ import Tooltip from "@/Components/ui/Tooltip";
 import Button from "@/Components/ui/Button";
 import useThemeClass from "@/Components/Hooks/useThemeClass";
 import Notification from "@/Components/ui/Notification";
-import { addQsheetList } from "@/helpers/Cuesheet/cuesheet_helper";
+import {
+  addQsheetList,
+  getQSheetCardDetails,
+} from "@/helpers/Cuesheet/cuesheet_helper";
 import TableContainer from "@/Components/Common/TableContainer";
 import { useMemo } from "react";
 import { Container } from "reactstrap";
 import BreadCrumb from "@/Components/Common/BreadCrumb";
+import { ToastContainer } from "react-toastify";
+import LoadCueSheetModal from "@/Components/Common/LoadCueSheetModal";
+import { getCustomerList } from "@/helpers/customer_helper";
 
 const inputStyle = {
   // border: '1px solid #ccc'
@@ -48,11 +54,12 @@ const initialData = {
   memo: "",
 };
 
-const NewQSheetContent = () => {
+const CreateCuesheetUser = () => {
   const rawPersistData = localStorage.getItem(PERSIST_STORE_NAME);
   const persistData = deepParseJson(rawPersistData);
   console.info("persistData", persistData);
   const userSeq = persistData.auth.user.userSeq;
+  const [isOpenLoadModal, setIsOpenLoadModal] = useState(false);
 
   const onConfirm = () => {
     let allRowsEmpty = false; // 모든 행이 빈 칸인지 여부를 추적
@@ -277,6 +284,12 @@ const NewQSheetContent = () => {
     setDataList([initialData]);
   };
 
+  const loadCueSheet = async (id) => {
+    const result = await getQSheetCardDetails(id);
+    setDataList([...result.data]);
+    setIsOpenLoadModal(false);
+  };
+
   const columns = useMemo(
     () => [
       {
@@ -401,6 +414,7 @@ const NewQSheetContent = () => {
     <div className="page-content">
       <Container fluid>
         <BreadCrumb title="큐시트 생성" pageTitle="큐시트 생성" />
+        <ToastContainer closeButton={false} />
         <div className="lg:flex items-center justify-between mb-4">
           <div className="flex flex-col md:flex-row md:items-center gap-1">
             <Button block size="sm" variant="twoTone" onClick={reset}>
@@ -412,8 +426,16 @@ const NewQSheetContent = () => {
             <Button block size="sm" variant="twoTone" onClick={onConfirm}>
               저장
             </Button>
+            <Button block size="sm" onClick={() => setIsOpenLoadModal(true)}>
+              불러오기
+            </Button>
           </div>
         </div>
+        <LoadCueSheetModal
+          show={isOpenLoadModal}
+          onLoadClick={(address) => loadCueSheet(address)}
+          onCloseClick={() => setIsOpenLoadModal(false)}
+        />
 
         <div>
           <TableContainer
@@ -435,4 +457,4 @@ const NewQSheetContent = () => {
   );
 };
 
-export default NewQSheetContent;
+export default CreateCuesheetUser;

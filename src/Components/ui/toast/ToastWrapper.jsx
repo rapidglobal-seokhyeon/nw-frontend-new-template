@@ -65,7 +65,7 @@ const useMessages = (msgKey) => {
 };
 
 const ToastWrapper = forwardRef((props, ref) => {
-  const rootRef = (useRef < HTMLDivElement) | (null > null);
+  const rootRef = useRef(null);
 
   const {
     transitionType = "scale",

@@ -21,8 +21,7 @@ export const GET_USERCARD = "/api/v1/usercard";
 
 //Qsheet
 export const GET_QSHEET_LIST = "/api/v1/qsheet";
+export const GET_QSHEET_HISTORY_LIST = "/api/v1/qsheetHistory";
 
-export const addQsheetList = (qsheet) => api.create(url.ADD_NEW_QSHEET, qsheet);
-export const updateQsheetList = (qsheet) => api.put(url.UPDATE_QSHEET, qsheet);
-export const deleteQsheetList = (qsheet) =>
-  api.delete(url.DELETE_QSHEET, { headers: { qsheet } });
+//File
+export const GET_FILES_LIST = "/api/v1/file/downloads";
