@@ -10,7 +10,7 @@ import {
 import useThemeClass from "@components/Hooks/useThemeClass";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 
-import toast from "@/Components/ui/toast";
+import { toast, ToastContainer } from "react-toastify";
 import Tooltip from "@/Components/ui/Tooltip";
 import { useReactToPrint } from "react-to-print";
 import { PERSIST_STORE_NAME } from "@/constants/app.constant";
@@ -118,11 +118,7 @@ const QSheetDetailsContent = () => {
     );
 
     if (hasEmptyRow) {
-      toast.push(
-        <Notification title={"실패"} type="warning">
-          입력되지 않은 행이 있습니다.
-        </Notification>
-      );
+      toast.error("입력되지 않은 행이 있습니다.");
       return; // 빈 행이 있을 경우 함수 종료
     }
 
@@ -178,15 +174,13 @@ const QSheetDetailsContent = () => {
       const response = await updateQsheetList(qsheetSeq, formData);
 
       if (response.status === 200) {
-        toast.push(
-          <Notification title={"큐시트가 수정되었습니다."} type="success">
-            큐시트가 수정되었습니다.
-          </Notification>
-        );
+        toast.success(" 큐시트가 수정되었습니다.");
+
         navigate("/cuesheet");
       }
     } catch (error) {
       // 에러를 처리합니다.
+      toast.error(" 큐시트가 수정 중 오류가 발생하였습니다.");
       console.error(error);
     }
   };

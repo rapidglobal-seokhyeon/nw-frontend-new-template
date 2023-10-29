@@ -6,6 +6,7 @@ import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import rootReducer from "./slices";
+import { ToastContainer } from "react-toastify";
 
 const store = configureStore({ reducer: rootReducer, devTools: true });
 
@@ -16,6 +17,7 @@ root.render(
     <React.Fragment>
       <BrowserRouter basename={import.meta.env.VITE_PUBLIC_URL}>
         <App />
+        <ToastContainer />
       </BrowserRouter>
     </React.Fragment>
   </Provider>
