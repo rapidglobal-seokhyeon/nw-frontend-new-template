@@ -21,3 +21,6 @@ export const addQsheetList = (qsheet) => api.create(url.ADD_NEW_QSHEET, qsheet);
 export const updateQsheetList = (qsheet) => api.put(url.UPDATE_QSHEET, qsheet);
 export const deleteQsheetList = (qsheet) =>
   api.delete(url.DELETE_QSHEET, { headers: { qsheet } });
+
+export const getQSheetCardDetails = (id) =>
+  api.get(`${url.GET_QSHEET_LIST}/${id}`);

@@ -48,6 +48,8 @@ import CuesheetUser from "../pages/Pages/RoleUser/Qsheet/CuesheetUser";
 import DocumentUser from "../pages/Pages/RoleUser/Document/DocumentUser";
 import CommunityUser from "../pages/Pages/RoleUser/Community/CommunityUser";
 import MypageUser from "../pages/Pages/RoleUser/Mypage/MypageUser";
+import QSheetDetailsContent from "@/pages/Pages/OrgAdmin/Cuesheet/Detail/QSheetDetailsContent";
+import NewQSheetContent from "@/pages/Pages/OrgAdmin/Cuesheet/Create/NewQSheetContent";
 
 const authProtectedRoutes = [
   { path: "/dashboard", component: <DashboardEcommerce /> },
@@ -70,7 +72,8 @@ const authProtectedRoutes = [
   { path: "/finaldocs", component: <FinalDocs /> }, // 최종확인서 관리
   { path: "/qsheettempl", component: <CuesheetTemplate /> }, // 큐시트 템플릿 관리
   { path: "/qsheet", component: <Cuesheet /> }, // 큐시트 관리,
-  { path: "/qsheet-create", component: <CreateCuesheet /> }, // 큐시트 생성
+  { path: "/qsheet-create", component: <NewQSheetContent /> }, // 큐시트 생성
+  { path: "/qsheet-detail/:qsheetSeq", component: <QSheetDetailsContent /> }, // 큐시트 세부정보
   { path: "/document", component: <Document /> }, // 문서 관리
   { path: "/community", component: <Community /> }, // 커뮤니티
   { path: "/customer", component: <Customer /> }, // 고객 관리

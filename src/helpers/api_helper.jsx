@@ -7,9 +7,10 @@ axios.defaults.baseURL = api.API_URL;
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
 // content type
-const token = JSON.parse(sessionStorage.getItem("authUser")) ? JSON.parse(sessionStorage.getItem("authUser")).accessToken : null;
+const token = JSON.parse(sessionStorage.getItem("authUser"))
+  ? JSON.parse(sessionStorage.getItem("authUser")).accessToken
+  : null;
 if (token) axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-
 // intercepting to capture errors
 axios.interceptors.response.use(
   function (response) {
@@ -35,13 +36,13 @@ axios.interceptors.response.use(
 
     let message = error.response.message || error;
     return Promise.reject(message);
-  },
+  }
 );
 /**
  * Sets the default authorization
  * @param {*} token
  */
-const setAuthorization = token => {
+const setAuthorization = (token) => {
   axios.defaults.headers.common["Authorization"] = "Bearer " + token;
 };
 
@@ -59,12 +60,13 @@ class APIClient {
     let paramKeys = [];
 
     if (params) {
-      Object.keys(params).map(key => {
+      Object.keys(params).map((key) => {
         paramKeys.push(key + "=" + params[key]);
         return paramKeys;
       });
 
-      const queryString = paramKeys && paramKeys.length ? paramKeys.join("&") : "";
+      const queryString =
+        paramKeys && paramKeys.length ? paramKeys.join("&") : "";
       response = axios.get(`${url}?${queryString}`, params);
     } else {
       response = axios.get(`${url}`, params);

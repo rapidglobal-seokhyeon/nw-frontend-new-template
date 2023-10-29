@@ -27,7 +27,7 @@ import {
 } from "../../../../slices/thunks";
 import { createSelector } from "reselect";
 import BreadCrumb from "../../../../Components/Common/BreadCrumb";
-import { Link } from "feather-icons-react/build/IconComponents";
+import { Link } from "react-router-dom";
 
 const Cuesheet = () => {
   const dispatch = useDispatch();
@@ -42,7 +42,7 @@ const Cuesheet = () => {
 
   const orgSeqList = qsheetLists.map((data) => data?.orgSeq);
   console.log(orgSeqList);
-
+  console.info("qsheetLists", qsheetLists);
   const [qsheet, setQsheet] = useState(null);
   const [deleteModal, setDeleteModal] = useState(false);
 
@@ -95,6 +95,17 @@ const Cuesheet = () => {
         Header: "큐시트 이름",
         accessor: "name",
         filterable: true,
+        Cell: (cell) => {
+          console.info("cell", cell);
+          return (
+            <Link
+              to={`/qsheet-detail/${cell.row.original.qsheetSeq}`}
+              className="text-body fw-bold"
+            >
+              {cell.row.original.name}
+            </Link>
+          );
+        },
       },
       {
         Header: "작성자 이름",
@@ -164,7 +175,8 @@ const Cuesheet = () => {
             <div className="col-sm-auto">
               <div>
                 <Link to="/qsheet-create" className="btn btn-success">
-                  <i className="ri-add-line align-bottom me-1"></i> 새로 만들기
+                  <i className="ri-add-line align-bottom me-1"></i>
+                  새로 만들기
                 </Link>
               </div>
             </div>
@@ -211,6 +223,14 @@ const Cuesheet = () => {
                     divClass="table-responsive mb-1 table-card"
                     tableClass="mb-0 align-middle table-nowrap"
                     theadClass="table-light text-muted"
+                    getTrProps={(state, rowInfo, column) => {
+                      return {
+                        onClick: (e) => {
+                          console.log(rowInfo.original);
+                          // history.push("/qsheet-create");
+                        },
+                      };
+                    }}
                     // isProductsFilter={true}
                     // SearchPlaceholder="Search Products..."
                   />
