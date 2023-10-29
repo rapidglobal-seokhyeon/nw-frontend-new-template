@@ -43,8 +43,6 @@ const CuesheetLog = () => {
   const [qsheet, setQsheet] = useState(null);
   const [deleteModal, setDeleteModal] = useState(false);
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     dispatch(onGetQsheetHistoryList());
   }, [dispatch]);

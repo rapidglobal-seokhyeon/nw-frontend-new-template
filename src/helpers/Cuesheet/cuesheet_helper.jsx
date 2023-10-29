@@ -25,8 +25,8 @@ export const updateQsheetList = (id, data) =>
   api.update(`${url.GET_QSHEET_LIST}/${id}`, data, {
     "Content-Type": "multipart/form-data",
   });
-export const deleteQsheetList = (qsheet) =>
-  api.delete(url.DELETE_QSHEET, { headers: { qsheet } });
+export const deleteQsheetList = (id) =>
+  api.delete(`${url.GET_QSHEET_LIST}/${id}`);
 
 export const getQSheetCardDetails = (id) =>
   api.get(`${url.GET_QSHEET_LIST}/${id}`);

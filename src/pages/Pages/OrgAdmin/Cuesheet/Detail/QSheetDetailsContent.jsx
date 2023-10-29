@@ -285,8 +285,9 @@ const QSheetDetailsContent = () => {
     };
     // dataContent 배열에 새 데이터 아이템을 추가합니다.
     setDataContent([...dataContent, newDataItem]);
+    console.info([...dataContent, newDataItem]);
   };
-
+  console.info("dasdas", dataContent);
   const ActionColumn = ({ row, dataContent, setDataContent }) => {
     const { textTheme } = useThemeClass();
 
@@ -301,16 +302,16 @@ const QSheetDetailsContent = () => {
     };
     // 행 삭제
     const onDelete = () => {
-      const rowData = dataContent.find(
-        (item) => item.orderIndex == row.orderIndex
-      );
+      console.info("dataContent", dataContent);
+      console.info("row", row);
+      const rowData = dataContent.find((item) => item.orderIndex == row.index);
 
       console.log(rowData);
       // 데이터를 삭제하고 업데이트된 배열을 생성합니다.
       const updatedData = dataContent.filter(
         (item) => item.orderIndex !== rowData.orderIndex
       );
-
+      console.info("updatedData", updatedData);
       // 업데이트된 배열을 qSheetExampleData로 설정하여 데이터를 삭제합니다.
       setDataContent(updatedData);
 
@@ -362,9 +363,12 @@ const QSheetDetailsContent = () => {
   });
 
   const downloadAllFile = async () => {
-    const fileNames = dataContent.map((item) => item.filePath);
-    const list = await getFilesByGroupId(qsheetSeq);
-    console.info("list", list);
+    const fileNames = dataContent.filter((item) => item.filePath);
+    if (fileNames.length === 0) {
+      alert("다운로드받을 파일이 없습니다.");
+      return;
+    }
+
     getFilesByGroupId(qsheetSeq).then((response) => {
       console.info("response", response);
       // create file link in browser's memory
@@ -380,13 +384,6 @@ const QSheetDetailsContent = () => {
       // clean up "a" element & remove ObjectURL
       document.body.removeChild(link);
       URL.revokeObjectURL(href);
-    });
-
-    const fileUrls = fileNames.forEach((fileName) => {
-      /*   window.open(
-        `http://localhost:8080/api/v1/cuesheet/download/${fileName}`,
-        "_blank"
-      );*/
     });
   };
   console.info("dataContent", dataContent);
@@ -536,7 +533,13 @@ const QSheetDetailsContent = () => {
       {
         Header: "액션",
         accessor: "action",
-        Cell: (cell) => <ActionColumn row={cell.row} />,
+        Cell: (cell) => (
+          <ActionColumn
+            row={cell.row}
+            dataContent={dataContent}
+            setDataContent={setDataContent}
+          />
+        ),
       },
     ],
     []

@@ -182,6 +182,7 @@ const NewQSheetContent = () => {
   // }
 
   const handleInputChange = (field, value, index) => {
+    console.info("index", index);
     console.log(dataList);
     const updatedDataList = [...dataList];
     updatedDataList[index][field] = value;
@@ -274,7 +275,18 @@ const NewQSheetContent = () => {
   };
 
   const reset = () => {
-    setDataList([initialData]);
+    console.info("initialData", initialData);
+    setDataList([
+      {
+        process: "",
+        actor: "",
+        content: "",
+        filePath: "",
+        note: "",
+        orderIndex: 1,
+        memo: "",
+      },
+    ]);
   };
 
   const columns = useMemo(

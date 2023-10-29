@@ -30,6 +30,7 @@ import BreadCrumb from "../../../../Components/Common/BreadCrumb";
 import { Link, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { useRef } from "react";
+import { deleteQsheetList } from "@/helpers/Cuesheet/cuesheet_helper";
 
 const Cuesheet = () => {
   const dispatch = useDispatch();
@@ -154,22 +155,14 @@ const Cuesheet = () => {
                 <i className="ri-more-fill" />
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-end">
-                <DropdownItem href="apps-ecommerce-product-details">
-                  <i className="ri-eye-fill align-bottom me-2 text-muted"></i>{" "}
-                  View
-                </DropdownItem>
-
-                <DropdownItem onClick={toggleEdit} isOpen={modal}>
-                  <i className="ri-pencil-fill align-bottom me-2 text-muted"></i>{" "}
-                  Edit
-                </DropdownItem>
-
-                <DropdownItem divider />
                 <DropdownItem
-                  href="#"
-                  onClick={() => {
-                    const productData = cellProps.row.original;
-                    onClickDelete(productData);
+                  onClick={async () => {
+                    deleteQsheetList(cellProps.row.original.qsheetSeq)
+                      .then((res) => {
+                        alert("삭제되었습니다.");
+                        dispatch(onGetQsheetList());
+                      })
+                      .catch((err) => alert("삭제에 실패하였습니다."));
                   }}
                 >
                   <i className="ri-delete-bin-fill align-bottom me-2 text-muted"></i>{" "}
@@ -208,6 +201,9 @@ const Cuesheet = () => {
                 <button className="btn btn-success" onClick={clickPrint}>
                   인쇄
                 </button>
+                <Link to="/qsheet-history/all" className="btn btn-success">
+                  수정내역
+                </Link>
               </div>
             </div>
             <div className="col-sm-3 ms-auto">

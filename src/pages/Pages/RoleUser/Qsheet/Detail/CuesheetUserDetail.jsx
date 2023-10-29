@@ -366,9 +366,12 @@ const CuesheetUserDetail = () => {
   });
 
   const downloadAllFile = async () => {
-    const fileNames = dataContent.map((item) => item.filePath);
-    const list = await getFilesByGroupId(qsheetSeq);
-    console.info("list", list);
+    const fileNames = dataContent.filter((item) => item.filePath);
+    if (fileNames.length === 0) {
+      alert("다운로드받을 파일이 없습니다.");
+      return;
+    }
+
     getFilesByGroupId(qsheetSeq).then((response) => {
       console.info("response", response);
       // create file link in browser's memory
