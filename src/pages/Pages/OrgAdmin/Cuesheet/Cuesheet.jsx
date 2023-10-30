@@ -240,6 +240,15 @@ const Cuesheet = () => {
                 >
                   인쇄
                 </button>
+                <button
+                  className="btn btn-success"
+                  onClick={() => {
+                    setSelectedIndex(qsheetLists.map((data) => data.qsheetSeq));
+                    setIsVisiblePrintModal(true);
+                  }}
+                >
+                  전체 인쇄
+                </button>
                 <Link to="/qsheet-history/all" className="btn btn-success">
                   수정내역
                 </Link>
