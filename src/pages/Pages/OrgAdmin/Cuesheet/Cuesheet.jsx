@@ -205,6 +205,8 @@ const Cuesheet = () => {
   return (
     <React.Fragment>
       <PrintCueSheetModal
+        //초기화용
+        key={selectedIndex.join(",")}
         show={isVisiblePrintModal}
         idList={selectedIndex}
         onCloseClick={() => setIsVisiblePrintModal(false)}

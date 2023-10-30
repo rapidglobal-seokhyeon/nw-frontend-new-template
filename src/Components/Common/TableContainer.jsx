@@ -150,6 +150,7 @@ const TableContainer = forwardRef((props, ref) => {
     divClass,
     SearchPlaceholder,
     setData,
+    pagination,
   } = props;
   const {
     getTableProps,
@@ -414,37 +415,41 @@ const TableContainer = forwardRef((props, ref) => {
             <span className="fw-semibold">{data.length}</span> Results
           </div>
         </div>
-        <div className="col-sm-auto">
-          <ul className="pagination pagination-separated pagination-md justify-content-center justify-content-sm-start mb-0">
-            <li
-              className={!canPreviousPage ? "page-item disabled" : "page-item"}
-            >
-              <Link to="#" className="page-link" onClick={previousPage}>
-                Previous
-              </Link>
-            </li>
-            {pageOptions.map((item, key) => (
-              <React.Fragment key={key}>
-                <li className="page-item">
-                  <Link
-                    to="#"
-                    className={
-                      pageIndex === item ? "page-link active" : "page-link"
-                    }
-                    onClick={() => gotoPage(item)}
-                  >
-                    {item + 1}
-                  </Link>
-                </li>
-              </React.Fragment>
-            ))}
-            <li className={!canNextPage ? "page-item disabled" : "page-item"}>
-              <Link to="#" className="page-link" onClick={nextPage}>
-                Next
-              </Link>
-            </li>
-          </ul>
-        </div>
+        {pagination !== false && (
+          <div className="col-sm-auto">
+            <ul className="pagination pagination-separated pagination-md justify-content-center justify-content-sm-start mb-0">
+              <li
+                className={
+                  !canPreviousPage ? "page-item disabled" : "page-item"
+                }
+              >
+                <Link to="#" className="page-link" onClick={previousPage}>
+                  Previous
+                </Link>
+              </li>
+              {pageOptions.map((item, key) => (
+                <React.Fragment key={key}>
+                  <li className="page-item">
+                    <Link
+                      to="#"
+                      className={
+                        pageIndex === item ? "page-link active" : "page-link"
+                      }
+                      onClick={() => gotoPage(item)}
+                    >
+                      {item + 1}
+                    </Link>
+                  </li>
+                </React.Fragment>
+              ))}
+              <li className={!canNextPage ? "page-item disabled" : "page-item"}>
+                <Link to="#" className="page-link" onClick={nextPage}>
+                  Next
+                </Link>
+              </li>
+            </ul>
+          </div>
+        )}
       </Row>
     </Fragment>
   );

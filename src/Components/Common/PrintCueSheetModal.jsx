@@ -6,7 +6,13 @@ import PropTypes from "prop-types";
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
-import { Modal, ModalBody } from "reactstrap";
+import {
+  Modal,
+  ModalBody,
+  Pagination,
+  PaginationItem,
+  PaginationLink,
+} from "reactstrap";
 import TableContainer from "./TableContainer";
 import { useMemo } from "react";
 import { useReactToPrint } from "react-to-print";
@@ -15,7 +21,7 @@ import { useRef } from "react";
 const PrintCueSheetModal = ({ show, onLoadClick, onCloseClick, idList }) => {
   const [address, setAddress] = useState("");
   const componentRef = useRef();
-  const [qsheetList, setQsheetList] = useState([]);
+  const [currentPage, setPage] = useState(0);
   const [dataContent, setDataContent] = useState([]);
   useEffect(() => {
     async function loadQsheetList() {
@@ -25,7 +31,7 @@ const PrintCueSheetModal = ({ show, onLoadClick, onCloseClick, idList }) => {
           console.info("result", result);
           const responseData = result?.data;
           console.info("responseData", responseData);
-          setDataContent((prev) => [...prev, ...responseData]);
+          setDataContent((prev) => [...prev, responseData]);
         }
       }
     }
@@ -87,7 +93,7 @@ const PrintCueSheetModal = ({ show, onLoadClick, onCloseClick, idList }) => {
     ],
     [dataContent]
   );
-
+  console.info("dataContent", dataContent);
   const clickPrint = useReactToPrint({
     content: () => componentRef.current,
     documentTitle: "CueSheet Content",
@@ -109,22 +115,35 @@ const PrintCueSheetModal = ({ show, onLoadClick, onCloseClick, idList }) => {
       fullscreen="xl"
     >
       <ModalBody>
-        {dataContent && (
-          <TableContainer
-            columns={columns}
-            data={dataContent}
-            ref={componentRef}
-            // isGlobalFilter={true}
-            isAddUserList={false}
-            customPageSize={10}
-            className="custom-header-css"
-            divClass="table-responsive mb-1 table-card"
-            tableClass="mb-0 align-middle table-nowrap"
-            theadClass="table-light text-muted"
-
-            // isProductsFilter={true}
-            // SearchPlaceholder="Search Products..."
-          />
+        {dataContent.length > 0 && (
+          <>
+            <TableContainer
+              columns={columns}
+              data={dataContent[currentPage]}
+              ref={componentRef}
+              // isGlobalFilter={true}
+              isAddUserList={false}
+              customPageSize={10}
+              className="custom-header-css"
+              divClass="table-responsive mb-1 table-card"
+              tableClass="mb-0 align-middle table-nowrap"
+              theadClass="table-light text-muted"
+              pagination={false}
+              // isProductsFilter={true}
+              // SearchPlaceholder="Search Products..."
+            />
+            <Pagination aria-label="Page navigation" size="sm">
+              {dataContent.map((item, index) => {
+                return (
+                  <PaginationItem key={`page-${index}`}>
+                    <PaginationLink onClick={() => setPage(index)}>
+                      {index + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                );
+              })}
+            </Pagination>
+          </>
         )}
         <div className="d-flex gap-2 justify-content-center mt-4 mb-2">
           <button
