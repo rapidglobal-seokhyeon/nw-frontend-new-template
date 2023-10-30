@@ -20,7 +20,6 @@ const LoadCueSheetModal = ({ show, onLoadClick, onCloseClick }) => {
     async function loadQsheetList() {
       const result = await getQsheetList();
       setQsheetList(result.content);
-      console.info("result", result);
     }
     loadQsheetList();
   }, []);
@@ -176,6 +175,7 @@ const LoadCueSheetModal = ({ show, onLoadClick, onCloseClick }) => {
                   const responseData = data?.data;
 
                   setDataContent(responseData);
+                  setSelectedIndex([]);
                 }
               }}
             >

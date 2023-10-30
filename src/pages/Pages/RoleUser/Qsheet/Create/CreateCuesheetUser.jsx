@@ -461,6 +461,7 @@ const CreateCuesheetUser = () => {
           </div>
         </div>
         <LoadCueSheetModal
+          key={`${Date.now()}`}
           show={isOpenLoadModal}
           onLoadClick={(dataList) => loadCueSheet(dataList)}
           onCloseClick={() => setIsOpenLoadModal(false)}
