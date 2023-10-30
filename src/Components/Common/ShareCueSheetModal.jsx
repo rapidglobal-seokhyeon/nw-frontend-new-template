@@ -4,18 +4,41 @@ import { useEffect } from "react";
 import { Modal, ModalBody } from "reactstrap";
 import html2canvas from "html2canvas";
 import { useCallback } from "react";
+import { uploadFile } from "@/helpers/File/file_helper";
+import { dataURItoBlob } from "@/utils/dataURIToBlob";
+import { useState } from "react";
 
 const ShareCueSheetModal = ({ show, onCloseClick, seq }) => {
-  const imageRef = useCallback((node) => {
-    if (node !== null) {
-      html2canvas(document.getElementsByClassName("table")[0]).then(
-        (canvas) => {
-          node.src = canvas.toDataURL("image/png");
-        }
-      );
-    }
-  }, []);
+  const [content, setContent] = useState("");
+  useEffect(() => {
+    html2canvas(document.getElementsByClassName("table")[0]).then(
+      async (canvas) => {
+        const blob = dataURItoBlob(canvas.toDataURL("image/png"));
+        const formData = new FormData(document.forms[0]);
+        formData.append(`files`, blob);
+        try {
+          // Axios나 fetch 등을 사용하여 API로 FormData를 POST 요청으로 보냅니다.
 
+          const response = await uploadFile(formData);
+
+          // API 응답을 필요에 따라 처리합니다.
+          setContent(`
+            <div>
+              공유 코드 : <b>${seq}</b>
+            </div>
+            <div>
+              <img src="http://152.69.228.245:10001${response.data[0]}" width='100%' />
+            </div>
+          `);
+          console.log(response.data);
+        } catch (error) {
+          // 에러를 처리합니다.
+          console.error(error);
+        }
+      }
+    );
+  }, []);
+  console.info("cont", content);
   return (
     <Modal
       fade={true}
@@ -45,24 +68,19 @@ const ShareCueSheetModal = ({ show, onCloseClick, seq }) => {
               gap: 10,
             }}
           >
-            <h4>공유 큐시트 주소</h4>
-            <input
-              value={seq}
+            <h4>공유 </h4>
+            <textarea
+              value={content}
+              readOnly={true}
               style={{
                 width: "100%",
-                padding: "10px 5px",
+                height: 200,
               }}
-              readOnly={true}
             />
           </div>
         </div>
-        <img
-          ref={imageRef}
-          style={{
-            maxWidth: "100%",
-          }}
-        />
-
+        <div>미리보기</div>
+        <div dangerouslySetInnerHTML={{ __html: content }}></div>
         <div className="d-flex gap-2 justify-content-center mt-4 mb-2">
           <button
             type="button"

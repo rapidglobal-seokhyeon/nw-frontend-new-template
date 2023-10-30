@@ -18,3 +18,9 @@ export const getFilesByGroupId = (id) => {
       throw message;
     });
 };
+
+export const uploadFile = (data) => {
+  return api.create(url.UPLOAD_FILE, data, {
+    "Content-Type": "multipart/form-data",
+  });
+};
