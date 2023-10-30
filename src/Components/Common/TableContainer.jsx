@@ -250,7 +250,11 @@ const TableContainer = forwardRef((props, ref) => {
   }, [activeId, page, prepareRow]);
 
   return (
-    <Fragment>
+    <div
+      style={{
+        breakAfter: "page",
+      }}
+    >
       <Row className="mb-3">
         {isGlobalSearch && (
           <Col md={1}>
@@ -451,7 +455,7 @@ const TableContainer = forwardRef((props, ref) => {
           </div>
         )}
       </Row>
-    </Fragment>
+    </div>
   );
 });
 

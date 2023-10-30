@@ -116,34 +116,25 @@ const PrintCueSheetModal = ({ show, onLoadClick, onCloseClick, idList }) => {
     >
       <ModalBody>
         {dataContent.length > 0 && (
-          <>
-            <TableContainer
-              columns={columns}
-              data={dataContent[currentPage]}
-              ref={componentRef}
-              // isGlobalFilter={true}
-              isAddUserList={false}
-              customPageSize={10}
-              className="custom-header-css"
-              divClass="table-responsive mb-1 table-card"
-              tableClass="mb-0 align-middle table-nowrap"
-              theadClass="table-light text-muted"
-              pagination={false}
-              // isProductsFilter={true}
-              // SearchPlaceholder="Search Products..."
-            />
-            <Pagination aria-label="Page navigation" size="sm">
-              {dataContent.map((item, index) => {
-                return (
-                  <PaginationItem key={`page-${index}`}>
-                    <PaginationLink onClick={() => setPage(index)}>
-                      {index + 1}
-                    </PaginationLink>
-                  </PaginationItem>
-                );
-              })}
-            </Pagination>
-          </>
+          <div ref={componentRef}>
+            {dataContent.map((data, index) => (
+              <TableContainer
+                key={`data-${index}`}
+                columns={columns}
+                data={data}
+                // isGlobalFilter={true}
+                isAddUserList={false}
+                customPageSize={10}
+                className="custom-header-css"
+                divClass="table-responsive mb-1 table-card"
+                tableClass="mb-0 align-middle table-nowrap"
+                theadClass="table-light text-muted"
+                pagination={false}
+                // isProductsFilter={true}
+                // SearchPlaceholder="Search Products..."
+              />
+            ))}
+          </div>
         )}
         <div className="d-flex gap-2 justify-content-center mt-4 mb-2">
           <button
