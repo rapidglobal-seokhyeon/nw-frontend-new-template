@@ -296,9 +296,8 @@ const CreateCuesheetUser = () => {
     setDataList([{ ...initialData }]);
   };
 
-  const loadCueSheet = async (id) => {
-    const result = await getQSheetCardDetails(id);
-    setDataList([...result.data]);
+  const loadCueSheet = async (dataList) => {
+    setDataList([...dataList]);
     setIsOpenLoadModal(false);
   };
 
@@ -463,7 +462,7 @@ const CreateCuesheetUser = () => {
         </div>
         <LoadCueSheetModal
           show={isOpenLoadModal}
-          onLoadClick={(address) => loadCueSheet(address)}
+          onLoadClick={(dataList) => loadCueSheet(dataList)}
           onCloseClick={() => setIsOpenLoadModal(false)}
         />
 

@@ -14,6 +14,8 @@ const LoadCueSheetModal = ({ show, onLoadClick, onCloseClick }) => {
   const [address, setAddress] = useState("");
   const [qsheetList, setQsheetList] = useState([]);
   const [dataContent, setDataContent] = useState();
+
+  const [selectedIndex, setSelectedIndex] = useState([]);
   useEffect(() => {
     async function loadQsheetList() {
       const result = await getQsheetList();
@@ -25,6 +27,45 @@ const LoadCueSheetModal = ({ show, onLoadClick, onCloseClick }) => {
 
   const columns = useMemo(
     () => [
+      {
+        id: "check",
+        Header: (
+          <input
+            type="checkbox"
+            onChange={(e) => {
+              if (e.target.checked) {
+                setSelectedIndex(dataContent.map((data) => data.orderIndex));
+              } else {
+                setSelectedIndex([]);
+              }
+            }}
+          />
+        ),
+        Cell: (cell) => {
+          return (
+            <input
+              type="checkbox"
+              className="productCheckBox form-check-input"
+              checked={selectedIndex.includes(cell.row.original.orderIndex)}
+              onClick={() => {
+                console.info("cell.row.original", cell.row.original);
+                if (selectedIndex.includes(cell.row.original.orderIndex)) {
+                  setSelectedIndex(
+                    selectedIndex.filter(
+                      (data) => data !== cell.row.original.orderIndex
+                    )
+                  );
+                } else {
+                  setSelectedIndex([
+                    ...selectedIndex,
+                    cell.row.original.orderIndex,
+                  ]);
+                }
+              }}
+            />
+          );
+        },
+      },
       {
         Header: "절차",
         accessor: "process",
@@ -76,7 +117,7 @@ const LoadCueSheetModal = ({ show, onLoadClick, onCloseClick }) => {
         accessor: "note",
       },
     ],
-    [dataContent]
+    [dataContent, selectedIndex]
   );
 
   return (
@@ -132,7 +173,6 @@ const LoadCueSheetModal = ({ show, onLoadClick, onCloseClick }) => {
               onClick={async () => {
                 const data = await getQSheetCardDetails(address);
                 if (data) {
-                  console.info("datadata", data);
                   const responseData = data?.data;
 
                   setDataContent(responseData);
@@ -172,7 +212,13 @@ const LoadCueSheetModal = ({ show, onLoadClick, onCloseClick }) => {
             type="button"
             className="btn w-sm btn-success"
             id="delete-record"
-            onClick={() => onLoadClick(address)}
+            onClick={() =>
+              onLoadClick(
+                dataContent.filter((data) =>
+                  selectedIndex.includes(data.orderIndex)
+                )
+              )
+            }
           >
             불러오기
           </button>
