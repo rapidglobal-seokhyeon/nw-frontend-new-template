@@ -297,7 +297,7 @@ const CreateCuesheetUser = () => {
   };
 
   const loadCueSheet = async (dataList) => {
-    setDataList([...dataList]);
+    setDataList((prev) => [...prev, ...dataList]);
     setIsOpenLoadModal(false);
   };
 
