@@ -559,11 +559,14 @@ const CuesheetUserDetail = () => {
   console.info("dataContent", dataContent);
   return (
     <div className="page-content">
-      <ShareCueSheetModal
-        show={isVisibleShareModal}
-        seq={qsheetSeq}
-        onCloseClick={() => setIsVisibleShareModal(false)}
-      />
+      {isVisibleShareModal && (
+        <ShareCueSheetModal
+          key={`${qsheetSeq}`}
+          show={isVisibleShareModal}
+          seq={qsheetSeq}
+          onCloseClick={() => setIsVisibleShareModal(false)}
+        />
+      )}
       <Container fluid>
         <BreadCrumb title="큐시트 내용" pageTitle="큐시트 내용" />
         <ToastContainer closeButton={false} />

@@ -37,7 +37,7 @@ const ShareCueSheetModal = ({ show, onCloseClick, seq }) => {
         }
       }
     );
-  }, []);
+  }, [seq]);
   console.info("cont", content);
   return (
     <Modal
